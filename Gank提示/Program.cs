@@ -65,13 +65,13 @@ namespace UniversalGankAlerter
         {
             _previewCircle = new PreviewCircle();
 
-            _menu = new Menu("Universal GankAlerter", "universalgankalerter", true);
-            _sliderRadius = new MenuItem("range", "Max Range").SetValue(new Slider(3000, 500, 5000));
+            _menu = new Menu("Gank提示", "universalgankalerter", true);
+            _sliderRadius = new MenuItem("range", "最大范围").SetValue(new Slider(3000, 500, 5000));
             _sliderRadius.ValueChanged += SliderRadiusValueChanged;
-            _sliderCooldown = new MenuItem("cooldown", "Cooldown (seconds)").SetValue(new Slider(10, 0, 60));
-            _sliderLineDuration = new MenuItem("lineduration", "Line Duration (seconds)").SetValue(new Slider(10, 0, 20));
-            _dangerPing = new MenuItem("dangerping", "Danger Ping (local)").SetValue(true);
-            _junglerOnly = new MenuItem("jungleronly", "Warn Jungler Only").SetValue(false);
+            _sliderCooldown = new MenuItem("cooldown", "冷却 (秒)").SetValue(new Slider(10, 0, 60));
+            _sliderLineDuration = new MenuItem("lineduration", "线上持续时间 (秒)").SetValue(new Slider(10, 0, 20));
+            _dangerPing = new MenuItem("dangerping", "危险提示 (本地ping)").SetValue(true);
+            _junglerOnly = new MenuItem("jungleronly", "只警惕打野").SetValue(false);
 
 
             _menu.AddItem(_sliderRadius);
