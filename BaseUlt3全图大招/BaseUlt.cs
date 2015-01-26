@@ -62,7 +62,7 @@ The idea where the lines come from is that u can calculate how far they are from
             Menu.AddItem(new MenuItem("showRecalls", "显示回城").SetValue(true));
             Menu.AddItem(new MenuItem("baseUlt", "启用全图大招").SetValue(true));
             Menu.AddItem(new MenuItem("checkCollision", "检测碰撞").SetValue(true));
-            Menu.AddItem(new MenuItem("panicKey", "连招时不是用大招").SetValue(new KeyBind(32, KeyBindType.Press))); //32 == space
+            Menu.AddItem(new MenuItem("panicKey", "连招时不使用大招").SetValue(new KeyBind(32, KeyBindType.Press))); //32 == space
             Menu.AddItem(new MenuItem("regardlessKey", "无时间限制 (按住)").SetValue(new KeyBind(17, KeyBindType.Press))); //17 == ctrl
             Menu.AddItem(new MenuItem("Vee", "Vee汉化"));       
             Heroes = ObjectManager.Get<Obj_AI_Hero>().ToList();
