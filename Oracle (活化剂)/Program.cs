@@ -103,9 +103,10 @@ namespace Oracle
             // Events
             GameObject.OnCreate += GameObject_OnCreate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-
-            Game.PrintChat("<font color=\"#1FFF8F\">Oracle r." + Revision + " -</font> by Kurisu，Translate by Vee！");
+         
+            Game.PrintChat("<font color=\"#1FFF8F\">娲诲寲鍓倊" + Revision + " -</font> 鍔犺浇鎴愬姛<font color=\"#00BFFF\">Vee姹夊寲!</font>");
         }
+
 
         private static GameObj _satchel, _miasma, _minefield, _crowstorm, _fizzbait, _caittrap;
         private static GameObj _chaosstorm, _glacialstorm, _lightstrike, _equinox, _tormentsoil;

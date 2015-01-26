@@ -88,7 +88,7 @@ namespace UniversalGankAlerter
                 }
             }
             _menu.AddToMainMenu();
-            Print("Loaded!");
+            Print("鍔犺浇鎴愬姛");
         }
 
         private void SliderRadiusValueChanged(object sender, OnValueChangeEventArgs e)
@@ -99,8 +99,8 @@ namespace UniversalGankAlerter
         private static void Print(string msg)
         {
             Game.PrintChat(
-                "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>GankAlerter:</font> <font color='#FFFFFF'>" +
-                msg + "</font>");
+                "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>Gank鎻愮ず:</font> <font color='#FFFFFF'>" +
+                msg + "</font>Vee姹夊寲！");
         }
 
         public bool IsEnabled(Obj_AI_Hero hero)

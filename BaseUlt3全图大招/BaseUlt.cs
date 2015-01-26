@@ -103,7 +103,7 @@ The idea where the lines come from is that u can calculate how far they are from
             if (compatibleChamp)
                 Game.OnGameUpdate += Game_OnGameUpdate;
 
-            Game.PrintChat("<font color=\"#1eff00\">BaseUlt3 by Beaving</font> - <font color=\"#00BFFF\">Translate by Vee！</font>");
+            Game.PrintChat("<font color=\"#1eff00\">鍏ㄥ浘澶ф嫑 - 鍔犺浇鎴愬姛</font> - <font color=\"#1FFF8F\">Vee姹夊寲</font>");
         }
 
         public bool IsCompatibleChamp(String championName)

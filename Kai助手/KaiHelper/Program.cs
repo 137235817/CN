@@ -46,7 +46,7 @@ namespace KaiHelper
             Game.PrintChat("<font color = \"#00FF2B\">KaiHelper</font> by <font color = \"#FD00FF\">kaigan</font>");
             Game.PrintChat(
                 "<font color = \"#0092FF\">Feel free to donate via Paypal to:</font> <font color = \"#F0FF00\">ntanphat2406@gmail.com</font>");
-            Game.PrintChat("KaiHelper - Loaded! Translate by Vee!");
+            Game.PrintChat("Kai鍔╂墜 -鍔犺浇鎴愬姛  Vee姹夊寲");
             Game.PrintChat(
                 "-------------------------------------------------------------------------------------------");
         }

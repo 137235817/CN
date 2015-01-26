@@ -137,7 +137,7 @@ namespace UniversalLeveler
 
             //CustomEvents.Unit.OnLevelUp += UnitOnOnLevelUp;
             Game.OnGameUpdate += GameOnOnGameUpdate; //Temp until levelup packet is fixed
-            Print("Loaded!");
+            Print("鍔犺浇鎴愬姛!");
         }
 
         private static void GameOnOnGameUpdate(EventArgs args)
@@ -203,8 +203,8 @@ namespace UniversalLeveler
         private static void Print(string msg)
         {
             Game.PrintChat(
-                "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>Leveler:</font> <font color='#FFFFFF'>" +
-                msg + "</font>Translate by Vee!");
+                "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>鑷姩鍔犵偣:</font> <font color='#FFFFFF'>" +
+                msg + "</font>Vee姹夊寲!");
         }
 
         private static MenuItem MakeSlider(string name, string display, int value, int min, int max)
