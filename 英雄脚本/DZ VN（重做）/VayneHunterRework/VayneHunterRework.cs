@@ -39,7 +39,7 @@ namespace VayneHunterRework
             Cleanser.CreateQSSSpellList();
 
             #region Menu
-            Menu = new Menu("VN", "VHRework", true);
+            Menu = new Menu("薇恩", "VHRework", true);
             var orbMenu = new Menu("走砍", "orbwalker");
             COrbwalker = new Orbwalking.Orbwalker(orbMenu);
             Menu.AddSubMenu(orbMenu);
@@ -51,57 +51,57 @@ namespace VayneHunterRework
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseQC", "使用Q")).SetValue(true);
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseEC", "使用E").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseRC", "使用R").SetValue(false));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "MP<= %不使用Q").SetValue(new Slider(35, 1, 100)));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "MP<= %不使用E").SetValue(new Slider(20, 1, 100)));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("NEnUlt", "敌人数多于X时开启大招").SetValue(new Slider(2, 1, 5)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "最小Q蓝量%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "最小E蓝量%").SetValue(new Slider(20, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("NEnUlt", "敌人>X使用大招").SetValue(new Slider(2, 1, 5)));
 
             Menu.AddSubMenu(new Menu("消耗", "Harrass"));
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseQH", "使用Q")).SetValue(true);
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseEH", "使用E").SetValue(true));
-            Menu.SubMenu("Harrass").AddItem(new MenuItem("QManaH", "MP<= %不使用Q").SetValue(new Slider(35, 1, 100)));
-            Menu.SubMenu("Harrass").AddItem(new MenuItem("EManaH", "MP<= %不使用E").SetValue(new Slider(20, 1, 100)));
+            Menu.SubMenu("Harrass").AddItem(new MenuItem("QManaH", "最小Q蓝量%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Harrass").AddItem(new MenuItem("EManaH", "最小E蓝量%").SetValue(new Slider(20, 1, 100)));
 
-            Menu.AddSubMenu(new Menu("补刀", "Farm"));
-            Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLH", "使用Q补刀")).SetValue(true);
+            Menu.AddSubMenu(new Menu("补兵", "Farm"));
+            Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLH", "使用Q补兵")).SetValue(true);
             Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLC", "使用Q清线")).SetValue(true);
-            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLH", "Mp<=不使用Q补刀"）tValue(new Slider(35, 1, 100)));
-            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLC", "Mp<=不使用Q清线"）SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLH", "补刀最小Q蓝量%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLC", "清线最小Q蓝量%").SetValue(new Slider(35, 1, 100)));
 
             var MiscSubMenu = new Menu("其他", "Misc");
 
             var MiscTSubMenu = new Menu("其他-翻滚", "MiscT");
             {
-                MiscTSubMenu.AddItem(new MenuItem("SmartQ", "先用QE连招").SetValue(false));
-                MiscTSubMenu.AddItem(new MenuItem("NoQEn", "不向敌方滚动").SetValue(true));
-                MiscTSubMenu.AddItem(new MenuItem("NoAAStealth", "隐身时不平A").SetValue(false));
+                MiscTSubMenu.AddItem(new MenuItem("SmartQ", "QE优先").SetValue(false));
+                MiscTSubMenu.AddItem(new MenuItem("NoQEn", "不往人堆里Q").SetValue(true));
+                MiscTSubMenu.AddItem(new MenuItem("NoAAStealth", "潜行时不要平A").SetValue(false));
                 MiscTSubMenu
                     .AddItem(
-                        new MenuItem("WallTumble", "向墙边滚动").SetValue(new KeyBind("Y".ToCharArray()[0],
+                        new MenuItem("WallTumble", "翻滚过墙").SetValue(new KeyBind("Y".ToCharArray()[0],
                             KeyBindType.Press)));
             }
-            var MiscCSubMenu = new Menu("其他-审判", "MiscC");
+            var MiscCSubMenu = new Menu("杂项-E设置", "MiscC");
             {
-                MiscCSubMenu.AddItem(new MenuItem("ENext", "手动E").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
-                MiscCSubMenu.AddItem(new MenuItem("PushDistance", "E拉开差距").SetValue(new Slider(425, 400, 500)));
-                MiscCSubMenu.AddItem(new MenuItem("CondemnTurret", "E到塔下").SetValue(false));
-                MiscCSubMenu.AddItem(new MenuItem("CondemnFlag", "把敌人E到皇子的旗帜上").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("ENext", "手动按键E").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+                MiscCSubMenu.AddItem(new MenuItem("PushDistance", "E推进距离").SetValue(new Slider(425, 400, 500)));
+                MiscCSubMenu.AddItem(new MenuItem("CondemnTurret", "试图E到塔上").SetValue(false));
+                MiscCSubMenu.AddItem(new MenuItem("CondemnFlag", "E到皇子的旗帜上").SetValue(true));
                 MiscCSubMenu.AddItem(new MenuItem("AutoE", "自动E").SetValue(false));
                 MiscCSubMenu.AddItem(new MenuItem("AutoEKS", "智能E击杀").SetValue(true));
-                MiscCSubMenu.AddItem(new MenuItem("NoEEnT", "敌方塔下不使用E").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("NoEEnT", "在敌人塔下不E").SetValue(true));
             }
             var MiscGSubMenu = new Menu("其他-一般", "MiscG");
             {
 
                 MiscGSubMenu.AddItem(new MenuItem("Packets", "使用封包").SetValue(true));
-                MiscGSubMenu.AddItem(new MenuItem("AntiGP", "E防突进")).SetValue(true);
-                MiscGSubMenu.AddItem(new MenuItem("Interrupt", "E打断技能").SetValue(true));
+                MiscGSubMenu.AddItem(new MenuItem("AntiGP", "反突进")).SetValue(true);
+                MiscGSubMenu.AddItem(new MenuItem("Interrupt", "打断技能").SetValue(true));
                 MiscGSubMenu
-                    .AddItem(new MenuItem("SpecialFocus", "优先攻击W标记两次以上目标").SetValue(false));
+                    .AddItem(new MenuItem("SpecialFocus", "重点目标 2次W标记").SetValue(false));
                 MiscGSubMenu
                     .AddItem(
-                        new MenuItem("ThreshLantern", "点锤石灯笼").SetValue(new KeyBind("S".ToCharArray()[0],
+                        new MenuItem("ThreshLantern", "点灯笼").SetValue(new KeyBind("S".ToCharArray()[0],
                             KeyBindType.Press)));
-                MiscGSubMenu.AddItem(new MenuItem("UseIgn", "使用引燃")).SetValue(true);
+                MiscGSubMenu.AddItem(new MenuItem("UseIgn", "使用点燃")).SetValue(true);
             }
             MiscSubMenu.AddSubMenu(MiscTSubMenu);
             MiscSubMenu.AddSubMenu(MiscCSubMenu);
@@ -110,7 +110,7 @@ namespace VayneHunterRework
 
             Menu.AddSubMenu(new Menu("草丛探测", "BushReveal"));
             //Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushReveal", "Bush Revealer").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Toggle)));
-            Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushRevealer", "草丛插眼审判").SetValue(true));
+            Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushRevealer", "E进草自动插眼").SetValue(true));
 
             Menu.AddSubMenu(new Menu("物品", "Items"));
             Menu.SubMenu("Items").AddItem(new MenuItem("BotrkC", "连招使用破败").SetValue(true));
@@ -122,13 +122,13 @@ namespace VayneHunterRework
             Menu.SubMenu("Items").AddItem(new MenuItem("OwnHPercBotrk", "自己血量低于（%）使用破败").SetValue(new Slider(50, 1, 100)));
             Menu.SubMenu("Items").AddItem(new MenuItem("EnHPercBotrk", "敌人血量低于（%）使用破败").SetValue(new Slider(20, 1, 100)));
 
-            Menu.AddSubMenu(new Menu("水银腰带", "QSSMenu"));
-            Menu.SubMenu("QSSMenu").AddItem(new MenuItem("UseQSS", "使用水银").SetValue(true));
-            Menu.SubMenu("QSSMenu").AddItem(new MenuItem("QSSMinBuffs", "有多少减益使用水银").SetValue(new Slider(2,1,5)));
+            Menu.AddSubMenu(new Menu("水银饰带", "QSSMenu"));
+           Menu.SubMenu("QSSMenu").AddItem(new MenuItem("UseQSS", "使用水银饰带").SetValue(true));
+            Menu.SubMenu("QSSMenu").AddItem(new MenuItem("QSSMinBuffs", "最少几个减益技能").SetValue(new Slider(2,1,5)));
 
-            Menu.AddSubMenu(new Menu("解除状态", "QSST"));
+            Menu.AddSubMenu(new Menu("净化选项1", "QSST"));
             Cleanser.CreateTypeQSSMenu();
-            Menu.AddSubMenu(new Menu("解除效果", "QSSSpell"));
+            Menu.AddSubMenu(new Menu("净化选项2", "QSSSpell"));
             Cleanser.CreateQSSSpellMenu();
             Menu.AddSubMenu(new Menu("不E", "NoCondemn"));
             CreateNoCondemnMenu();
@@ -150,12 +150,12 @@ namespace VayneHunterRework
             Menu.SubMenu("Draw").AddItem(new MenuItem("DrawCond", "显示击晕后位置").SetValue(new Circle(true, Color.Red)));
             Menu.SubMenu("Draw").AddItem(new MenuItem("DrawDrake", "显示翻墙点1").SetValue(new Circle(true, Color.WhiteSmoke)));
             Menu.SubMenu("Draw").AddItem(new MenuItem("DrawMid", "显示翻墙点2").SetValue(new Circle(true, Color.WhiteSmoke)));
-
+			
             Menu.AddToMainMenu();
             #endregion
 
-            Game.PrintChat("<font color='#FF0000'>VayneHunter</font> <font color='#FFFFFF'>鍔犺浇鎴愬姛!</font>");
-            Game.PrintChat("By <font color='#FF0000'>DZ191</font><font color='#FFFFFF'>Special Thanks to: Kurisuu & KonoeChan</font>Vee姹夊寲");
+            Game.PrintChat("<font color='#FF0000'>VayneHunter</font> <font color='#FFFFFF'>鍔犺浇鎴愬姛!!</font>");
+            Game.PrintChat("By <font color='#FF0000'>DZ</font><font color='#FFFFFF'>191</font>. Special Thanks to: Kurisuu & KonoeChan - Vee姹夊寲！");
             Game.PrintChat("If you like my assemblies feel free to donate me (link on the forum :) )");
 
            //Cleanser.cleanUselessSpells();
