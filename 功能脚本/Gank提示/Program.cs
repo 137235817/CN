@@ -100,7 +100,7 @@ namespace UniversalGankAlerter
         {
             Game.PrintChat(
                 "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>Gank鎻愮ず:</font> <font color='#FFFFFF'>" +
-                msg + "</font>Vee姹夊寲！");
+                msg + "</font>Vee姹夊寲");
         }
 
         public bool IsEnabled(Obj_AI_Hero hero)

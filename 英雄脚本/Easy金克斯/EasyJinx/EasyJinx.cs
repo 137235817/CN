@@ -77,7 +77,7 @@ namespace EasyJinx
             Menu.SubMenu("Misc").AddItem(new MenuItem("Misc_qswitch", "补兵切换机枪").SetValue(true));
             Menu.SubMenu("Misc").AddItem(new MenuItem("Misc_wrange", "W最小范围").SetValue(new Slider(500, 0, (int)Spells.get("W").Range)));
 			
-			Menu.AddSubMenu(new Menu("Vee", "Vee汉化")); 
+			Menu.AddItem(new MenuItem("Vee", "Vee汉化"));  
         }
 		
 

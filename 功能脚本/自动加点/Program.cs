@@ -85,7 +85,7 @@ namespace UniversalLeveler
         {
             if (_debug.GetValue<bool>())
             {
-                Print("Leveling " + spellSlot);
+                Print("鍗囩骇" + spellSlot);
             }
             Utility.DelayAction.Add(_delay.GetValue<Slider>().Value, () => ObjectManager.Player.Spellbook.LevelSpell(spellSlot));
         }
@@ -204,7 +204,7 @@ namespace UniversalLeveler
         {
             Game.PrintChat(
                 "<font color='#ff3232'>Universal</font><font color='#d4d4d4'>鑷姩鍔犵偣:</font> <font color='#FFFFFF'>" +
-                msg + "</font>Vee姹夊寲!");
+                msg + "</font>");
         }
 
         private static MenuItem MakeSlider(string name, string display, int value, int min, int max)
