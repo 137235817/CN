@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using OC = Oracle.Program;
@@ -17,10 +16,11 @@ namespace Oracle.Extensions
 
             _mainMenu = new Menu("消耗品", "imenu");
 
-            CreateMenuItem("蓝瓶", "Mana", 45, 0);
             CreateMenuItem("饼干", "BiscuitHealthMana", 45, 35);
+            CreateMenuItem("蓝药", "Mana", 45, 0);
             CreateMenuItem("水晶瓶", "FlaskHealthMana", 45, 35);
-            CreateMenuItem("血瓶", "Health", 45, 45);
+            CreateMenuItem("红药", "Health", 45, 45);
+            CreateMenuItem("坚韧合剂", "ElixirHealth,", 20, 45);
 
             root.AddSubMenu(_mainMenu);
         }
@@ -31,6 +31,7 @@ namespace Oracle.Extensions
             UseItem("ItemMiniRegenPotion", 2010, "BiscuitHealthMana");
             UseItem("ItemCrystalFlask", 2041, "FlaskHealthMana");
             UseItem("RegenerationPotion", 2003, "Health");
+            UseItem("ElixirOfWrath", 2140, "Health");
         }
 
         private static void UseItem(string name, int itemId, string menuvar)
@@ -45,7 +46,7 @@ namespace Oracle.Extensions
                 return;
 
             var aManaPercent = (int)((Me.Mana / Me.MaxMana) * 100);
-            var aHealthPercent = (int) ((Me.Health/Me.MaxHealth)*100);
+            var mHealthPercent = (int) ((Me.Health/Me.MaxHealth)*100);
 
             var iDamagePercent = (int) ((OC.IncomeDamage/Me.MaxHealth)*100);
             var mDamagePercent = (int) ((OC.MinionDamage/Me.MaxHealth)*100);
@@ -56,19 +57,25 @@ namespace Oracle.Extensions
                     Items.UseItem(itemId);
             }
 
-            if (menuvar.Contains("Health") && aHealthPercent <= _mainMenu.Item("use" + menuvar + "Pct").GetValue<Slider>().Value)
+            if (menuvar.Contains("Health") && mHealthPercent <= _mainMenu.Item("use" + menuvar + "Pct").GetValue<Slider>().Value)
             {
                 if (iDamagePercent >= 1 || OC.IncomeDamage >= Me.Health || Me.HasBuff("summonerdot", true) ||
                     mDamagePercent >= 1 || OC.MinionDamage >= Me.Health || Me.HasBuffOfType(BuffType.Damage))
                 {
                     if (OC.AggroTarget.NetworkId == Me.NetworkId)
+                    {
                         Items.UseItem(itemId);
+                        OC.Logger(OC.LogType.Action, "Used " + name + " (Low HP) on " + Me.SkinName + " (" + mHealthPercent + "%) !");
+                    }
                 }
 
                 else if (iDamagePercent >= _mainMenu.Item("use" + menuvar + "Dmg").GetValue<Slider>().Value)
                 {
                     if (OC.AggroTarget.NetworkId == Me.NetworkId)
+                    {
                         Items.UseItem(itemId);
+                        OC.Logger(OC.LogType.Action, "Used " + name + " (Damage Chunk) on " + Me.SkinName + " (" + mHealthPercent + "%) !");
+                    }
                 }
             }
         }
@@ -76,15 +83,17 @@ namespace Oracle.Extensions
         private static void CreateMenuItem(string name, string menuvar, int dvalue, int dmgvalue)
         {
             var menuName = new Menu(name, "m" + menuvar);
-            menuName.AddItem(new MenuItem("use" + menuvar, "Use " + name)).SetValue(true);
+            menuName.AddItem(new MenuItem("use" + menuvar, "使用" + name)).SetValue(true);
+
             if (menuvar.Contains("Health"))
             {
-                menuName.AddItem(new MenuItem("use" + menuvar + "Pct", "Use on HP &")).SetValue(new Slider(dvalue));
-                menuName.AddItem(new MenuItem("use" + menuvar + "Dmg", "Use on Dmg dealt %")).SetValue(new Slider(dmgvalue));
+                menuName.AddItem(new MenuItem("use" + menuvar + "Pct", "使用最低生命值%")).SetValue(new Slider(dvalue));
+                menuName.AddItem(new MenuItem("use" + menuvar + "Dmg", "使用最低伤害%")).SetValue(new Slider(dmgvalue));
             }
 
             if (menuvar.Contains("Mana"))
-                menuName.AddItem(new MenuItem("use" + menuvar + "Mana", "Use on Mana %")).SetValue(new Slider(40));
+                menuName.AddItem(new MenuItem("use" + menuvar + "Mana", "使用最低魔力值%")).SetValue(new Slider(40));
+
             _mainMenu.AddSubMenu(menuName);
         }
     }

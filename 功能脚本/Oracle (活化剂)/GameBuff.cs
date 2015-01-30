@@ -32,15 +32,6 @@ namespace Oracle
 
             CleanseBuffs.Add(new GameBuff
             {
-                ChampionName = "Darius",
-                BuffName = "dariusnoxiantacticsonh",
-                SpellName = "dariusnoxiantacticsonh",
-                Slot = SpellSlot.W,
-                Delay = 0
-            });
-
-            CleanseBuffs.Add(new GameBuff
-            {
                 ChampionName = "Fizz",
                 BuffName = "fizzmarinerdoombomb",
                 SpellName = "fizzmarinerdoom",

@@ -15,8 +15,8 @@ namespace Oracle.Extensions
         {
             Game.OnGameUpdate += Game_OnGameUpdate;
 
-            _mainMenu = new Menu("进攻", "omenu");
-            _menuConfig = new Menu("进攻配置", "oconfig");
+            _mainMenu = new Menu("攻击", "omenu");
+            _menuConfig = new Menu("攻击配置", "oconfig");
 
             foreach (var x in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
                 _menuConfig.AddItem(new MenuItem("ouseOn" + x.SkinName, "Use for " + x.SkinName)).SetValue(true);
@@ -32,7 +32,6 @@ namespace Oracle.Extensions
             CreateMenuItem("冰霜女皇的旨令", "Frostclaim", 100, 30);
             CreateMenuItem("神圣之剑", "Divine", 90, 30);
             CreateMenuItem("守护者的号角", "Guardians", 90, 30);
-            CreateMenuItem("黯炎火炬", "Torch", 100, 30);
             CreateMenuItem("冰霜战锤", "Entropy", 90, 30);
 
             root.AddSubMenu(_mainMenu);
@@ -49,24 +48,21 @@ namespace Oracle.Extensions
             {
                 if (OC.CanManamune)
                 {
-                    if (_mainMenu.Item("muraMode").GetValue<StringList>().SelectedIndex == 1 &&
-                        !OC.Origin.Item("ComboKey").GetValue<KeyBind>().Active)
+                    if (_mainMenu.Item("muraMode").GetValue<StringList>().SelectedIndex != 1 ||
+                        OC.Origin.Item("usecombo").GetValue<KeyBind>().Active)
                     {
-                        return;
-                    }
+                        var manamune = Me.GetSpellSlot("Muramana");
+                        if (manamune != SpellSlot.Unknown && !Me.HasBuff("Muramana"))
+                        {
+                            if (Me.Mana/Me.MaxMana*100 > _mainMenu.Item("useMuramanaMana").GetValue<Slider>().Value)
+                                Me.Spellbook.CastSpell(manamune);
 
-                    var manamune = Me.GetSpellSlot("Muramana");
-                    if (manamune != SpellSlot.Unknown && !Me.HasBuff("Muramana"))
-                    {
-                        if (Me.Mana/Me.MaxMana*100 > _mainMenu.Item("useMuramanaMana").GetValue<Slider>().Value)
-                            Me.Spellbook.CastSpell(manamune);
-
-                         Utility.DelayAction.Add(400, () => OC.CanManamune = false);
-                        
+                            Utility.DelayAction.Add(400, () => OC.CanManamune = false);
+                        }
                     }
                 }
 
-                if (!OC.CanManamune && !OC.Origin.Item("ComboKey").GetValue<KeyBind>().Active)
+                if (!OC.CanManamune && !OC.Origin.Item("usecombo").GetValue<KeyBind>().Active)
                 {
                     var manamune = Me.GetSpellSlot("Muramana");
                     if (manamune != SpellSlot.Unknown && Me.HasBuff("Muramana"))
@@ -78,13 +74,11 @@ namespace Oracle.Extensions
 
             if (OC.CurrentTarget.IsValidTarget())
             {
-                if (OC.Origin.Item("ComboKey").GetValue<KeyBind>().Active)
+                if (OC.Origin.Item("usecombo").GetValue<KeyBind>().Active)
                 {
                     UseItem("Entropy", 3184, 450f, true);
                     UseItem("Guardians", 2051, 450f);
                     UseItem("Entropy", 3184, 450f, true);
-                    UseItem("Torch", 3188, 750f, true);
-                    UseItem("Torch", 3188, 750f, true);
                     UseItem("Frostclaim", 3092, 850f, true);
                     UseItem("Youmuus", 3142, 650f);
                     UseItem("Hydra", 3077, 250f);
@@ -93,22 +87,17 @@ namespace Oracle.Extensions
                     UseItem("Cutlass", 3144, 450f, true);
                     UseItem("Botrk", 3153, 450f, true);
                     UseItem("Divine", 3131, 650f);
-                    UseItem("DFG", 3128, 750f, true);
                 }
             }
         }
 
         private static void UseItem(string name, int itemId, float range, bool targeted = false)
         {
-            var damage = 0f;
             if (!Items.HasItem(itemId) || !Items.CanUseItem(itemId))
                 return;
 
             if (!_mainMenu.Item("use" + name).GetValue<bool>())
                 return;
-
-            if (itemId == 3128 || itemId == 3188)
-                damage = OC.GetComboDamage(Me, OC.CurrentTarget);
 
             if (OC.CurrentTarget.Distance(Me.Position) <= range)
             {
@@ -135,21 +124,27 @@ namespace Oracle.Extensions
 
                         var po = Prediction.GetPrediction(pi);
                         if (po.Hitchance >= HitChance.Medium)
+                        {
                             Items.UseItem(itemId, po.CastPosition);
+                            OC.Logger(OC.LogType.Action,
+                                "Used " + name + " near " + po.CastPosition.CountEnemiesInRange(300) + " enemies!");
+                        }
 
                     }
+
                     else if (targeted)
                     {
-                        if ((itemId == 3128 || itemId == 3188) && damage <= OC.CurrentTarget.Health / 2)
-                            return;
-
                         Items.UseItem(itemId, OC.CurrentTarget);
+                        OC.Logger(Program.LogType.Action, "Used " + name + " (Targeted Enemy HP) on " + OC.CurrentTarget.SkinName);
                     }
+
                     else
                     {
                         Items.UseItem(itemId);
+                        OC.Logger(Program.LogType.Action, "Used " + name + " (Self Enemy HP) on " + OC.CurrentTarget.SkinName);
                     }
                 }
+
                 else if (aHealthPercent <= _mainMenu.Item("use" + name + "Me").GetValue<Slider>().Value &&
                          _mainMenu.Item("ouseOn" + OC.CurrentTarget.SkinName).GetValue<bool>())
                 {
@@ -158,28 +153,30 @@ namespace Oracle.Extensions
                     else
                         Items.UseItem(itemId);
 
+                    OC.Logger(Program.LogType.Action, "Used " + name + " (Low My HP) on " + OC.CurrentTarget.SkinName);
                 }
             }
         }
 
         private static void CreateMenuItem(string displayname, string name, int evalue, int avalue, bool usemana = false)
         {
-            var menuName = new Menu(displayname, name.ToLower());
-            menuName.AddItem(new MenuItem("use" + name, "Use " + name)).SetValue(true);
-            menuName.AddItem(new MenuItem("use" + name + "Pct", "Use on enemy HP %")).SetValue(new Slider(evalue));
+            var menuName = new Menu(name, name.ToLower());
+
+            menuName.AddItem(new MenuItem("use" + name, "Use " + displayname)).SetValue(true);
+            menuName.AddItem(new MenuItem("use" + name + "Pct", "敌方血量低于%使用")).SetValue(new Slider(evalue));
 
             if (!usemana)
-                menuName.AddItem(new MenuItem("use" + name + "Me", "Use on my HP %")).SetValue(new Slider(avalue));
+                menuName.AddItem(new MenuItem("use" + name + "Me", "自己血量低于%使用")).SetValue(new Slider(avalue));
 
             if (usemana)
-                menuName.AddItem(new MenuItem("use" + name + "Mana", "Minimum mana % to use")).SetValue(new Slider(35));
+                menuName.AddItem(new MenuItem("use" + name + "Mana", "使用最小法力值%")).SetValue(new Slider(35));
+
 
             if (name == "Muramana")
-                menuName.AddItem( new MenuItem("muraMode", " Muramana Mode: ").SetValue(new StringList(new[] {"Always", "Combo"}, 1)));
+                menuName.AddItem(
+                    new MenuItem("muraMode", " 魔切-模式: ").SetValue(new StringList(new[] {"总是", "连招"}, 1)));
 
             _mainMenu.AddSubMenu(menuName);
         }
-
-        public static Obj_AI_Hero _current { get; set; }
     }
 }

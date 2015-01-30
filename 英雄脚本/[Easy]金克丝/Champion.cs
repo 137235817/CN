@@ -41,7 +41,7 @@ abstract class Champion
         InitializeSpells(ref Spells);
         InitializeSkins(ref SkinManager);
 
-        Menu = new Menu("[Easy]" + "閲戝厠涓濓紒", "[Easy]" + "閲戝厠涓濓紒", true);
+        Menu = new Menu("[Easy]" + "金克丝", "[Easy]" + "金克丝", true);
 
         SkinManager.AddToMenu(ref Menu);
         BushManager.AddToMenu(ref Menu);
