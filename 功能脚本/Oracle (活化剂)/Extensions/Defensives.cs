@@ -39,10 +39,9 @@ namespace Oracle.Extensions
             bMenu.AddItem(new MenuItem("useBanner", "使用")).SetValue(true);
             _mainMenu.AddSubMenu(bMenu);
 
-            CreateMenuItem("沃格勒特的巫师帽", "Wooglets", "selfzhonya", 35, 40);
-            CreateMenuItem("奥黛恩的面纱", "Odyns", "selfcount", 40, 40);
+            CreateMenuItem("沃格勒特的巫师帽", "巫师帽", "selfzhonya", 35, 40);
+            CreateMenuItem("奥黛恩的面纱", "面纱", "selfcount", 40, 40);
 
-            CreateMenuItem("沃格勒特的巫师帽", "Wooglets", "selfzhonya", 35, 40);
             var oMenu = new Menu("扫描透镜", "olens");
             oMenu.AddItem(new MenuItem("useOracles", "对隐形单位使用")).SetValue(true);
             oMenu.AddItem(new MenuItem("oracleMode", "模式: ")).SetValue(new StringList(new[] { "总是使用", "连招" }));
