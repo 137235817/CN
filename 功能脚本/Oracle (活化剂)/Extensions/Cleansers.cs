@@ -77,11 +77,8 @@ namespace Oracle.Extensions
                             {
                                 Items.UseItem(itemId, target);
                                 OC.Logger(OC.LogType.Action,
-                                    "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) for: " + buff.BuffName);
+                                    "Used " + name + " on " + target.SkinName + " (" + tHealthPercent + "%) for: " + buff.BuffName);
                             });
-
-                            OC.Logger(OC.LogType.Danger,
-                                "Dangerous cleanse buff on " + target.SkinName + " (" + tHealthPercent + "%)");
                         }
                     }
 
@@ -89,77 +86,77 @@ namespace Oracle.Extensions
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (slow)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (slow)");
                     }
 
                     if (OC.Origin.Item("stun").GetValue<bool>() && target.HasBuffOfType(BuffType.Stun))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (stun)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (stun)");
                     }
 
                     if (OC.Origin.Item("charm").GetValue<bool>() && target.HasBuffOfType(BuffType.Charm))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (charm)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (charm)");
                     }
 
                     if (OC.Origin.Item("taunt").GetValue<bool>() && target.HasBuffOfType(BuffType.Taunt))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (taunt)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (taunt)");
                     }
 
                     if (OC.Origin.Item("fear").GetValue<bool>() && target.HasBuffOfType(BuffType.Fear))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (fear)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (fear)");
                     }
 
                     if (OC.Origin.Item("snare").GetValue<bool>() && target.HasBuffOfType(BuffType.Snare))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (snare)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (snare)");
                     }
 
                     if (OC.Origin.Item("silence").GetValue<bool>() && target.HasBuffOfType(BuffType.Silence))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (silence)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (silence)");
                     }
 
                     if (OC.Origin.Item("suppression").GetValue<bool>() && target.HasBuffOfType(BuffType.Suppression))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (suppression)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (suppression)");
                     }
 
                     if (OC.Origin.Item("polymorph").GetValue<bool>() && target.HasBuffOfType(BuffType.Polymorph))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (polymorph)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (polymorph)");
                     }
 
                     if (OC.Origin.Item("blind").GetValue<bool>() && target.HasBuffOfType(BuffType.Blind))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (blind)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (blind)");
                     }
 
                     if (OC.Origin.Item("poison").GetValue<bool>() && target.HasBuffOfType(BuffType.Poison))
                     {
                         Utility.DelayAction.Add(delay, () => Items.UseItem(itemId, target));
                         OC.Logger(OC.LogType.Action,
-                            "Used cleanser on " + target.SkinName + " (" + tHealthPercent + "%) (poison)");
+                            "Used  " + name + "  on " + target.SkinName + " (" + tHealthPercent + "%) (poison)");
                     }
                 }
             }
@@ -168,7 +165,7 @@ namespace Oracle.Extensions
         private static void CreateMenuItem(string displayname, string name, int ccvalue)
         {
             var menuName = new Menu(name, name);
-            menuName.AddItem(new MenuItem("use" + name, "使用 " + name)).SetValue(true);
+            menuName.AddItem(new MenuItem("use" + name, "使用" + displayname)).SetValue(true);
             menuName.AddItem(new MenuItem(name + "Count", "清除减益（数量）"));//.SetValue(new Slider(ccvalue, 1, 5));
             menuName.AddItem(new MenuItem(name + "Duration", "清除减益（持续时间）"));//.SetValue(new Slider(2, 1, 5));
             _mainMenu.AddSubMenu(menuName);

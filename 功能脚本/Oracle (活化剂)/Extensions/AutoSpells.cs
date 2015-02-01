@@ -83,6 +83,7 @@ namespace Oracle.Extensions
             CreateMenuItem(0, "vladimirsanguinepool", "血红之池(吸血鬼)", "teamvladimirzhonya", SpellSlot.W, false);
             CreateMenuItem(0, "zedult", "禁奥义!瞬狱影杀阵(劫)", "herozedzhonya", SpellSlot.R, false);
             CreateMenuItem(0, "nocturneshroudofdarkness", "黑暗庇护(梦魇)", "teamnocturnezhonyaCC", SpellSlot.W, false);
+
             root.AddSubMenu(_mainMenu);
         }
 
@@ -137,10 +138,10 @@ namespace Oracle.Extensions
             UseSpell("eyeofthestorm", "jannashield", 800f);
             UseSpell("karmasolkimshield", "karmashield", 800f);
             UseSpell("luxprismaticwave", "luxshield", 1075f);
-            UseSpell("nautiluspiercinggaze", "nautshield");
+            UseSpell("nautiluspiercinggaze", "nautilusshield");
             UseSpell("orianaredactcommand", "oriannashield", 1100f);
             UseSpell("shenfeint", "shenshield", float.MaxValue, false);
-            UseSpell("jarvanivgoldenaegis", "j4shield");
+            UseSpell("jarvanivgoldenaegis", "jarvanivshield");
             UseSpell("blindmonkwone", "leeshield", 700f, false);
             UseSpell("rivenfeint", "rivenshield", float.MaxValue, false);
             UseSpell("rumbleshield", "rumbleshield");
@@ -226,7 +227,8 @@ namespace Oracle.Extensions
                     if (OC.AggroTarget.NetworkId == cooptarget.NetworkId)
                     {
                         kalistar.Cast();
-                        OC.Logger(Program.LogType.Action, "Saving soulbound target: " + cooptarget.SkinName);
+                        OC.Logger(Program.LogType.Action,
+                            "Saving soulbound target: " + cooptarget.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }
             }
@@ -244,7 +246,7 @@ namespace Oracle.Extensions
             {
                 return;
             }
-
+          
             var spell = new Spell(slot, range);
 
             var target = range < 5000 ? OC.Friendly() : Me;
@@ -253,6 +255,7 @@ namespace Oracle.Extensions
                 return;
             }
 
+            var aHealthPercent = target.Health/target.MaxHealth*100;
             if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
             {
                 return;
@@ -266,7 +269,7 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Auto Spell: Spell Shield) Casting " + spell.Slot + "(Dangerous Ult) on " + target.SkinName);
+                            "(SCC) Casting " + spell.Slot + "(Dangerous Ult) on " + target.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }
             }
@@ -279,7 +282,7 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Auto Spell: Spell Shield) Casting " + spell.Slot + "(Dangerous CC) on " + target.SkinName);
+                            "(SCC) Casting " + spell.Slot + "(Dangerous CC) on " + target.SkinName +" (" + aHealthPercent + "%)");
                     }
                 }
             }
@@ -292,7 +295,7 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Auto Spell: Spell Shield) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName);
+                            "(SCC) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }               
             }
@@ -305,7 +308,7 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Auto Spell: Spell Shield) Casting " + spell.Slot + "(Any Spell) on " + target.SkinName);
+                            "(SCC) Casting " + spell.Slot + "(Any Spell) on " + target.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }
             }
@@ -327,6 +330,7 @@ namespace Oracle.Extensions
             if (target.Distance(Me.ServerPosition, true) > range * range)
                 return;
 
+            var aHealthPercent = target.Health / target.MaxHealth * 100;
             if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
                 return;
 
@@ -339,7 +343,7 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Auto Spell: Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName);
+                            "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }
 
@@ -358,8 +362,7 @@ namespace Oracle.Extensions
                                         .OrderByDescending(ene => ene.Health/ene.MaxHealth*100))
                             {
                                 spell.CastOnUnit(ene);
-                                OC.Logger(Program.LogType.Action,
-                                    "(Auto Spell: Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
+                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
                                 OC.Logger(OC.LogType.Info, "Evade target info: ");
                                 OC.Logger(OC.LogType.Info, "HP %: " + ene.Health/ene.MaxHealth*100);
                                 OC.Logger(OC.LogType.Info, "Current HP %: " + ene.Health);
@@ -378,7 +381,8 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                                    "(Auto Spell: Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName);
+                            "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName + " (" +
+                            aHealthPercent + "%)");
                     }
                 }
 
@@ -396,8 +400,7 @@ namespace Oracle.Extensions
                                         .OrderByDescending(ene => ene.Health/ene.MaxHealth*100))
                             {
                                 spell.CastOnUnit(ene);
-                                OC.Logger(Program.LogType.Action,
-                                    "(Auto Spell: Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
+                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
                                 OC.Logger(OC.LogType.Info, "Evade target info: ");
                                 OC.Logger(OC.LogType.Info, "HP %: " + ene.Health / ene.MaxHealth * 100);
                                 OC.Logger(OC.LogType.Info, "Current HP %: " + ene.Health);
@@ -412,17 +415,18 @@ namespace Oracle.Extensions
         {
             if (!menuvar.Contains(OC.ChampionName.ToLower()))
                 return;
-
-            var slot = Me.GetSpellSlot(sdataname);
+            
+            var slot = Me.GetSpellSlot(sdataname);        
             if (slot != SpellSlot.Unknown && !_mainMenu.Item("use" + menuvar).GetValue<bool>())
                 return;
 
+            
             var spell = new Spell(slot, range);
             var target = range < 5000 ? OC.Friendly() : Me;
 
             if (target.Distance(Me.ServerPosition, true) > range*range)
-                return;    
-
+                return;
+      
             if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
                 return;
          
@@ -443,6 +447,7 @@ namespace Oracle.Extensions
 
             if (menuvar.Contains("shield") || menuvar.Contains("ult"))
             {
+                
                 if (aHealthPercent > _mainMenu.Item("use" + menuvar + "Pct").GetValue<Slider>().Value)
                     return;
 

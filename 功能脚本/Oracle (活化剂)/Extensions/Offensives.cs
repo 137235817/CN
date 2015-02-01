@@ -24,7 +24,6 @@ namespace Oracle.Extensions
 
             CreateMenuItem("魔切", "魔切", 90, 30, true);
             CreateMenuItem("提亚马特/九头蛇", "提亚马特/九头蛇", 90, 30);
-            CreateMenuItem("冥火之拥", "冥火之拥", 100, 30);
             CreateMenuItem("海克斯科技枪刃", "海克斯科技枪刃", 90, 30);
             CreateMenuItem("幽梦之灵", "幽梦之灵", 90, 30);
             CreateMenuItem("比尔吉沃特弯刀", "比尔吉沃特弯刀", 90, 30);

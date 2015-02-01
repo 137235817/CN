@@ -136,8 +136,7 @@ namespace Oracle.Extensions
                 Exhaust.AddItem(new MenuItem("aExhaustPct", "友方血量低于（%）使用")).SetValue(new Slider(35));
                 Exhaust.AddItem(new MenuItem("eExhaustPct", "敌方血量低于（%）使用")).SetValue(new Slider(35));
                 Exhaust.AddItem(new MenuItem("exhDanger", "对危险敌人使用")).SetValue(true);
-                Exhaust.AddItem(new MenuItem("exhaustMode", "模式: "))
-                    .SetValue(new StringList(new[] {"总是开启", "连招"}));
+                Exhaust.AddItem(new MenuItem("exhaustMode", "模式: ")).SetValue(new StringList(new[] {"总是开启", "连招"}));
                 _mainMenu.AddSubMenu(Exhaust);
             }
 

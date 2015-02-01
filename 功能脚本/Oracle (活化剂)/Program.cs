@@ -36,7 +36,7 @@ namespace Oracle
         public static int LastTick;
         public static bool CanManamune;
         public static string ChampionName;
-        public const string Revision = "217";
+        public const string Revision = "219";
 
         public static Menu Origin;
         public static Obj_AI_Hero Attacker;

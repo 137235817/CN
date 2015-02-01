@@ -183,7 +183,7 @@ namespace Oracle.Core.Targeted
                 new TargetSpellData("drmundo", "infectedcleavermissilecast", SpellSlot.Q, SpellType.Skillshot, CcType.Slow, 1000, 500, 1500, true),
                 new TargetSpellData("drmundo", "burningagony", SpellSlot.W, SpellType.Self, CcType.No, 225, float.MaxValue, float.MaxValue),
                 new TargetSpellData("drmundo", "masochism", SpellSlot.E, SpellType.Self, CcType.No, 0, float.MaxValue, float.MaxValue),
-                new TargetSpellData("drmundo", "sadism", SpellSlot.R, SpellType.Self, CcType.No, 0, float.MaxValue, float.MaxValue),
+                new TargetSpellData("drmundo", "sadism", SpellSlot.R, SpellType.Self, CcType.No, 0, float.MaxValue, float.MaxValue, false, false, true),
 
                 #endregion DrMundo
 
@@ -262,7 +262,7 @@ namespace Oracle.Core.Targeted
                 new TargetSpellData("garen", "garenq", SpellSlot.Q, SpellType.Self, CcType.No, 0, 200, float.MaxValue),
                 new TargetSpellData("garen", "garenw", SpellSlot.W, SpellType.Self, CcType.No, 0, 500, float.MaxValue),
                 new TargetSpellData("garen", "garene", SpellSlot.E, SpellType.Self, CcType.No, 325, 0, 700),
-                new TargetSpellData("garen", "garenr", SpellSlot.R, SpellType.Targeted, CcType.No, 400, 120, float.MaxValue, true),
+                new TargetSpellData("garen", "garenr", SpellSlot.R, SpellType.Targeted, CcType.No, 400, 120, float.MaxValue, false, false, true),
 
                 #endregion Garen
 
@@ -359,7 +359,7 @@ namespace Oracle.Core.Targeted
                 new TargetSpellData("karma", "karmaq", SpellSlot.Q, SpellType.Skillshot, CcType.No, 950, 500, 902),
                 new TargetSpellData("karma", "karmaspiritbind", SpellSlot.W, SpellType.Targeted, CcType.Snare, 700, 500, 2000),
                 new TargetSpellData("karma", "karmasolkimshield", SpellSlot.E, SpellType.Targeted, CcType.No, 800, 500, float.MaxValue),
-                new TargetSpellData("karma", "karmamantra", SpellSlot.R, SpellType.Self, CcType.No, 0, 500, 1300),
+                new TargetSpellData("karma", "karmamantra", SpellSlot.R, SpellType.Self, CcType.No, 0, 500, 1300, false, false, true),
 
                 #endregion Karma
 
