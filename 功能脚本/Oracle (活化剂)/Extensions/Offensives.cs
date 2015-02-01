@@ -22,16 +22,16 @@ namespace Oracle.Extensions
                 _menuConfig.AddItem(new MenuItem("ouseOn" + x.SkinName, "Use for " + x.SkinName)).SetValue(true);
             _mainMenu.AddSubMenu(_menuConfig);
 
-            CreateMenuItem("魔切", "魔切", 90, 30, true);
-            CreateMenuItem("提亚马特/九头蛇", "提亚马特/九头蛇", 90, 30);
-            CreateMenuItem("海克斯科技枪刃", "海克斯科技枪刃", 90, 30);
-            CreateMenuItem("幽梦之灵", "幽梦之灵", 90, 30);
-            CreateMenuItem("比尔吉沃特弯刀", "比尔吉沃特弯刀", 90, 30);
-            CreateMenuItem("破败王者之刃", "破败王者之刃", 70, 70);
-            CreateMenuItem("冰霜女皇的旨令", "冰霜女皇的旨令", 100, 30);
-            CreateMenuItem("神圣之剑", "神圣之剑", 90, 30);
-            CreateMenuItem("守护者的号角", "守护者的号角", 90, 30);
-            CreateMenuItem("冰霜战锤", "冰霜战锤", 90, 30);
+            CreateMenuItem("魔切", "Muramana", 90, 30, true);
+            CreateMenuItem("提亚马特/九头蛇", "Hydra", 90, 30);
+            CreateMenuItem("海克斯科技枪刃", "Hextech", 90, 30);
+            CreateMenuItem("幽梦之灵", "Youmuus", 90, 30);
+            CreateMenuItem("比尔吉沃特弯刀", "Cutlass", 90, 30);
+            CreateMenuItem("破败王者之刃", "Botrk", 70, 70);
+            CreateMenuItem("冰霜女皇的旨令", "Frostclaim", 100, 30);
+            CreateMenuItem("神圣之剑", "Divine", 90, 30);
+            CreateMenuItem("守护者的号角", "Guardians", 90, 30);
+            CreateMenuItem("冰霜战锤", "Entropy", 90, 30);
 
             root.AddSubMenu(_mainMenu);
         }

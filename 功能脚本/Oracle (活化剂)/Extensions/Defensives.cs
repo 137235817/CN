@@ -22,11 +22,11 @@ namespace Oracle.Extensions
                 _menuConfig.AddItem(new MenuItem("DefenseOn" + x.SkinName, "Use for " + x.SkinName)).SetValue(true);
             _mainMenu.AddSubMenu(_menuConfig);
 
-            CreateMenuItem("兰顿之兆", "兰顿", "selfcount", 40, 40);
-            CreateMenuItem("炽天使之翼", "大天使",  "selfhealth", 55, 40);
-            CreateMenuItem("中亚沙漏", "中亚", "selfzhonya", 35, 40);
-            CreateMenuItem("山岳之容", "山岳", "allyhealth", 20, 40);
-            CreateMenuItem("钢铁烈阳之匣", "鸟盾", "allyhealth", 45, 40);
+            CreateMenuItem("兰顿之兆", "Randuins", "selfcount", 40, 40);
+            CreateMenuItem("炽天使之翼", "Seraphs",  "selfhealth", 55, 40);
+            CreateMenuItem("中亚沙漏", "Zhonyas", "selfzhonya", 35, 40);
+            CreateMenuItem("山岳之容", "Mountain", "allyhealth", 20, 40);
+            CreateMenuItem("钢铁烈阳之匣", "Locket", "allyhealth", 45, 40);
 
             var tMenu = new Menu("飞升护符", "tboost");
             tMenu.AddItem(new MenuItem("useTalisman", "使用")).SetValue(true);
@@ -39,8 +39,8 @@ namespace Oracle.Extensions
             bMenu.AddItem(new MenuItem("useBanner", "使用")).SetValue(true);
             _mainMenu.AddSubMenu(bMenu);
 
-            CreateMenuItem("沃格勒特的巫师帽", "巫师帽", "selfzhonya", 35, 40);
-            CreateMenuItem("奥黛恩的面纱", "面纱", "selfcount", 40, 40);
+            CreateMenuItem("沃格勒特的巫师帽", "Wooglets", "selfzhonya", 35, 40);
+            CreateMenuItem("奥黛恩的面纱", "Odyns", "selfcount", 40, 40);
 
             var oMenu = new Menu("扫描透镜", "olens");
             oMenu.AddItem(new MenuItem("useOracles", "对隐形单位使用")).SetValue(true);
