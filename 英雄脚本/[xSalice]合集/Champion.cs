@@ -93,27 +93,26 @@ namespace xSaliceReligionAIO
             menu = new Menu(Player.ChampionName, Player.ChampionName, true);
 
             //Info
-            menu.AddSubMenu(new Menu("信息", "Info"));
+            menu.AddSubMenu(new Menu("Info", "Info"));
             menu.SubMenu("Info").AddItem(new MenuItem("Author", "By xSalice"));
             menu.SubMenu("Info").AddItem(new MenuItem("Paypal", "Donate: xSalicez@gmail.com"));
-            menu.SubMenu("Info").AddItem(new MenuItem("Vee", "Vee汉化"));
 
             //Target selector
-            var targetSelectorMenu = new Menu("目标选择", "Target Selector");
+            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             menu.AddSubMenu(targetSelectorMenu);
 
             //Orbwalker submenu
-            OrbwalkerMenu.AddItem(new MenuItem("走砍模式", "Change Orbwalker", true).SetValue(false));
+            OrbwalkerMenu.AddItem(new MenuItem("Orbwalker_Mode", "Change Orbwalker", true).SetValue(false));
             menu.AddSubMenu(OrbwalkerMenu);
             ChooseOrbwalker(menu.Item("Orbwalker_Mode", true).GetValue<bool>());
 
             //Packet Menu
-            menu.AddSubMenu(new Menu("封包设置", "Packets"));
-            menu.SubMenu("Packets").AddItem(new MenuItem("packet", "使用封包", true).SetValue(false));
+            menu.AddSubMenu(new Menu("Packet Setting", "Packets"));
+            menu.SubMenu("Packets").AddItem(new MenuItem("packet", "Use Packets", true).SetValue(false));
 
             //Item Menu
-            var itemMenu = new Menu("物品和召唤师技能", "Items");
+            var itemMenu = new Menu("Items and Summoners", "Items");
             ActiveItems.AddToMenu(itemMenu);
             menu.AddSubMenu(itemMenu);
 
@@ -123,7 +122,7 @@ namespace xSaliceReligionAIO
             {
                 if (Activator.CreateInstance(null, "xSaliceReligionAIO.Champions." + Player.ChampionName) != null)
                 {
-                    Game.PrintChat("<font color = \"#FFB6C1\">xSalice's " + Player.ChampionName + " 鍔犺浇鎴愬姛 Vee姹夊寲</font>");
+                    Game.PrintChat("<font color = \"#FFB6C1\">xSalice's " + Player.ChampionName + " Loaded!</font>");
                 }
             }
             catch
