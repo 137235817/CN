@@ -87,7 +87,7 @@ namespace xSaliceReligionAIO.Champions
                 harass.AddItem(new MenuItem("turretCheck", "禁止在塔下 骚扰", true).SetValue(true));
                 //add to menu
                 menu.AddSubMenu(harass);
-            
+            }
             var farm = new Menu("补兵", "Farming");
             {
                 farm.AddItem(new MenuItem("UseQFarm", "使用 Q", true).SetValue(true));

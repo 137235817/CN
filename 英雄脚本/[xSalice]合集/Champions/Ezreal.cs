@@ -117,7 +117,7 @@ namespace xSaliceReligionAIO.Champions
                 menu.AddSubMenu(farm);
             }
 
-            var miscMenu = new Menu("杂项", "Misc");
+            var miscMenu = new Menu("其他", "Misc");
             {
                 miscMenu.AddItem(
                     new MenuItem("Misc_Use_WE", "鼠标方向手动WE", true).SetValue(new KeyBind("T".ToCharArray()[0],
@@ -126,7 +126,7 @@ namespace xSaliceReligionAIO.Champions
                 menu.AddSubMenu(miscMenu);
             }
 
-            var drawMenu = new Menu("范围", "Drawing");
+            var drawMenu = new Menu("范围显示", "Drawing");
             {
                 drawMenu.AddItem(new MenuItem("Draw_Disabled", "禁用 所有",true).SetValue(false));
                 drawMenu.AddItem(new MenuItem("Draw_Q", "Q 范围",true).SetValue(true));
