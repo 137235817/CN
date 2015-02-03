@@ -142,7 +142,7 @@ namespace Xerath
 			//Translator
             subMenu = _menu.MainMenu.AddSubMenu("Vee汉化"); 
 			
-            Game.PrintChat("澶嶄粐涔嬬煕-鍔犺浇鎴愬姛   Vee姹夊寲!");			
+            Game.PrintChat("杩滃彜宸伒-鍔犺浇鎴愬姛   Vee姹夊寲!");			
         }
     }
 }
