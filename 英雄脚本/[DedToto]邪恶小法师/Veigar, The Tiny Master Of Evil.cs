@@ -256,7 +256,7 @@ namespace Veigar__The_Tiny_Master_Of_Evil
             menu.SubMenu("Keys").AddItem(new MenuItem("LastHitWW", "使用W清线").SetValue(new KeyBind("K".ToCharArray()[0], KeyBindType.Press, false)));
             menu.SubMenu("Keys").AddItem(new MenuItem("JungleActive", "清野").SetValue(new KeyBind("H".ToCharArray()[0], KeyBindType.Press, false)));
             menu.SubMenu("Keys").AddItem(new MenuItem("ExtraNeeded", "显示额外伤害").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle, true)));
-            menu.SubMenu("Keys").AddItem(new MenuItem("InfoTable", "显示Table信息[掉FPS]").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+            menu.SubMenu("Keys").AddItem(new MenuItem("InfoTable", "Table显示信息[掉FPS]").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
 
             //Drawings menu:
             menu.AddSubMenu(new Menu("显示设置", "Drawings"));
@@ -317,7 +317,7 @@ namespace Veigar__The_Tiny_Master_Of_Evil
             menu.SubMenu("Farm").AddItem(new MenuItem("dontfarm", "连招时禁用Q补兵").SetValue(true));
             menu.SubMenu("Farm").AddItem(new MenuItem("OnlySiege", "一波小兵只补尾刀").SetValue(false));
             menu.SubMenu("Farm").AddItem(new MenuItem("WAmount", "使用W|小兵数").SetValue(new Slider(3, 1, 7)));
-            menu.SubMenu("Farm").AddItem(new MenuItem("FarmMove", "跟随鼠标移动").SetValue(new StringList(new[] { "从不", "清线", "Q补兵", "清线&Q补兵" }, 0)));
+            menu.SubMenu("Farm").AddItem(new MenuItem("FarmMove", "跟随鼠标移动").SetValue(new StringList(new[] { "从不", "清线", "Q补兵", "清线和Q补兵" }, 0)));
 
             //Jungle Farm menu:
             menu.AddSubMenu(new Menu("清野", "Jungle Clear"));
