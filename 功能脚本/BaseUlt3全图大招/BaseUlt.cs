@@ -10,6 +10,8 @@ using Collision = LeagueSharp.Common.Collision;
 using Color = System.Drawing.Color;
 using Font = SharpDX.Direct3D9.Font;
 
+using ObjectManager = LeagueSharp.Common.ObjectHandler; 
+
 namespace BaseUlt3
 {
     /*
@@ -48,6 +50,8 @@ The idea where the lines come from is that u can calculate how far they are from
 
         Font Text;
 
+        System.Drawing.Color NotificationColor = System.Drawing.Color.FromArgb(136, 207, 240);
+
         static float BarX = Drawing.Width * 0.425f;
         float BarY = Drawing.Height * 0.80f;
         static int BarWidth = (int)(Drawing.Width - 2 * BarX);
@@ -58,13 +62,12 @@ The idea where the lines come from is that u can calculate how far they are from
         public BaseUlt()
         {
             (Menu = new Menu("全图大招", "BaseUlt3", true)).AddToMainMenu();
-			
             Menu.AddItem(new MenuItem("showRecalls", "显示回城").SetValue(true));
-            Menu.AddItem(new MenuItem("baseUlt", "启用全图大招").SetValue(true));
+            Menu.AddItem(new MenuItem("baseUlt", "Base Ult").SetValue(true));
             Menu.AddItem(new MenuItem("checkCollision", "检测碰撞").SetValue(true));
             Menu.AddItem(new MenuItem("panicKey", "连招时不使用大招").SetValue(new KeyBind(32, KeyBindType.Press))); //32 == space
             Menu.AddItem(new MenuItem("regardlessKey", "无时间限制 (按住)").SetValue(new KeyBind(17, KeyBindType.Press))); //17 == ctrl
-            Menu.AddItem(new MenuItem("Vee", "Vee汉化"));       
+
             Heroes = ObjectManager.Get<Obj_AI_Hero>().ToList();
             Enemies = Heroes.Where(x => x.IsEnemy).ToList();
             Allies = Heroes.Where(x => x.IsAlly).ToList();
@@ -79,11 +82,16 @@ The idea where the lines come from is that u can calculate how far they are from
             if (compatibleChamp)
             {
                 foreach (Obj_AI_Hero champ in Allies.Where(x => !x.IsMe && IsCompatibleChamp(x.ChampionName)))
-                    TeamUlt.AddItem(new MenuItem(champ.ChampionName, "支持全图大的队友: " + champ.ChampionName).SetValue(false).DontSave());
+                    TeamUlt.AddItem(new MenuItem(champ.ChampionName, "支持全图大的队友:  " + champ.ChampionName).SetValue(false).DontSave());
 
                 foreach (Obj_AI_Hero champ in Enemies)
-                    DisabledChampions.AddItem(new MenuItem(champ.ChampionName, "不要选择: " + champ.ChampionName).SetValue(false).DontSave());
+                    DisabledChampions.AddItem(new MenuItem(champ.ChampionName, "不要选择:" + champ.ChampionName).SetValue(false).DontSave());
             }
+
+            var NotificationsMenu = Menu.AddSubMenu(new Menu("通知", "Notifications"));
+
+            NotificationsMenu.AddItem(new MenuItem("notifRecFinished", "回城完成").SetValue(true));
+            NotificationsMenu.AddItem(new MenuItem("notifRecAborted", "回城中止").SetValue(true));
 
             EnemySpawnPos = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy).Position; //ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Type == GameObjectType.obj_SpawnPoint && x.IsEnemy).Position;
 
@@ -103,7 +111,20 @@ The idea where the lines come from is that u can calculate how far they are from
             if (compatibleChamp)
                 Game.OnGameUpdate += Game_OnGameUpdate;
 
-            Game.PrintChat("<font color=\"#1eff00\">鍏ㄥ浘澶ф嫑 - 鍔犺浇鎴愬姛</font> - <font color=\"#1FFF8F\">Vee姹夊寲</font>");
+            ShowNotification("<font color=\"#1eff00\">鍏ㄥ浘澶ф嫑 - 鍔犺浇鎴愬姛</font> - <font color=\"#1FFF8F\">Vee姹夊寲</font>", NotificationColor, 3000);
+        }
+
+        public Notification ShowNotification(string message, System.Drawing.Color color, int duration = -1, bool dispose = true)
+        {
+            var notif = new Notification(message).SetTextColor(color);
+            Notifications.AddNotification(notif);
+
+            if(dispose)
+            {
+                Utility.DelayAction.Add(duration, () => notif.Dispose());
+            }
+
+            return notif;
         }
 
         public bool IsCompatibleChamp(String championName)
@@ -178,7 +199,7 @@ The idea where the lines come from is that u can calculate how far they are from
                 var timeneeded = GetUltTravelTime(champ, UltSpellData[champ.ChampionName].Speed, UltSpellData[champ.ChampionName].Delay, EnemySpawnPos) - 65;
 
                 if (enemyInfo.RecallInfo.GetRecallCountdown() >= timeneeded)
-                    enemyInfo.RecallInfo.IncomingDamage[champ.NetworkId] = (float)Damage.GetSpellDamage(champ, enemyInfo.Player, SpellSlot.R, UltSpellData[champ.ChampionName].SpellStage) * UltSpellData[champ.ChampionName].DamageMultiplicator;
+                    enemyInfo.RecallInfo.IncomingDamage[champ.NetworkId] = (float)champ.GetSpellDamage(enemyInfo.Player, SpellSlot.R, UltSpellData[champ.ChampionName].SpellStage) * UltSpellData[champ.ChampionName].DamageMultiplicator;
                 else if (enemyInfo.RecallInfo.GetRecallCountdown() < timeneeded - (champ.IsMe ? 0 : 125)) //some buffer for allies so their damage isnt getting reset
                 {
                     enemyInfo.RecallInfo.IncomingDamage[champ.NetworkId] = 0;
@@ -295,7 +316,28 @@ The idea where the lines come from is that u can calculate how far they are from
             }
 
             var recall = Packet.S2C.Teleport.Decoded(unit, args);
-            EnemyInfo.Find(x => x.Player.NetworkId == recall.UnitNetworkId).RecallInfo.UpdateRecall(recall);
+            var enemyInfo = EnemyInfo.Find(x => x.Player.NetworkId == recall.UnitNetworkId).RecallInfo.UpdateRecall(recall);
+
+            if(recall.Type == Packet.S2C.Teleport.Type.Recall)
+            {
+                switch(recall.Status)
+                {
+                    case Packet.S2C.Teleport.Status.Abort:
+                        if(Menu.Item("notifRecAborted").GetValue<bool>())
+                        {
+                            ShowNotification(enemyInfo.Player.ChampionName + ": Recall ABORTED", System.Drawing.Color.Orange, 4000);
+                        }
+                        
+                        break;
+                    case Packet.S2C.Teleport.Status.Finish:
+                        if (Menu.Item("notifRecFinished").GetValue<bool>())
+                        {
+                            ShowNotification(enemyInfo.Player.ChampionName + ": Recall FINISHED", NotificationColor, 4000);
+                        }
+
+                        break;
+                }
+            }
         }
 
         void Drawing_OnPostReset(EventArgs args)

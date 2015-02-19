@@ -1,4 +1,4 @@
-// Copyright 2014 - 2014 Esk0r
+﻿// Copyright 2014 - 2014 Esk0r
 // Evader.cs is part of Evade.
 // 
 // Evade is free software: you can redistribute it and/or modify
@@ -203,13 +203,13 @@ namespace Evade
                 {
                     if (isBlink)
                     {
-                        if (Environment.TickCount - Program.LastWardJumpAttempt < 250 ||
+                        if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingFirstTimeOffset, delay))
                         {
                             goodTargets.Add(target);
                         }
 
-                        if (Environment.TickCount - Program.LastWardJumpAttempt < 250 ||
+                        if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingSecondTimeOffset, delay))
                         {
                             badTargets.Add(target);
@@ -221,13 +221,13 @@ namespace Evade
                         pathToTarget.Add(ObjectManager.Player.ServerPosition.To2D());
                         pathToTarget.Add(target.ServerPosition.To2D());
 
-                        if (Environment.TickCount - Program.LastWardJumpAttempt < 250 ||
+                        if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafePath(pathToTarget, Config.EvadingFirstTimeOffset, speed, delay).IsSafe)
                         {
                             goodTargets.Add(target);
                         }
 
-                        if (Environment.TickCount - Program.LastWardJumpAttempt < 250 ||
+                        if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafePath(pathToTarget, Config.EvadingSecondTimeOffset, speed, delay).IsSafe)
                         {
                             badTargets.Add(target);

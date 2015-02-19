@@ -15,17 +15,17 @@ namespace PerplexedEzreal
         {
             Items = new List<Item>();
             //Offensive
-            Items.Add(new Item("Cutlass", "比尔吉沃特弯刀", 3144, ItemType.Offensive, 450));
-            Items.Add(new Item("BORK", "破败", 3153, ItemType.Offensive, 450));
-            Items.Add(new Item("Ghostblade", "幽梦", 3142, ItemType.Offensive, Player.AttackRange));
-            Items.Add(new Item("Gunblade", "海克斯的科技枪", 3146, ItemType.Offensive, 700));
-            Items.Add(new Item("DFG", "冥火之拥", 3128, ItemType.Offensive, 750));
+            Items.Add(new Item("Cutlass", "Bilgewater Cutlass", 3144, ItemType.Offensive, 450));
+            Items.Add(new Item("BORK", "BORK", 3153, ItemType.Offensive, 450));
+            Items.Add(new Item("Ghostblade", "Youmuu's Ghostblade", 3142, ItemType.Offensive, Player.AttackRange));
+            Items.Add(new Item("Gunblade", "Hextech Gunblade", 3146, ItemType.Offensive, 700));
+            Items.Add(new Item("DFG", "Deathfire Grasp", 3128, ItemType.Offensive, 750));
             //Defensive
-            Items.Add(new Item("Seraphs", "大天使", 3040, ItemType.Defensive));
-            Items.Add(new Item("Zhonyas", "中亚沙漏", 3157, ItemType.Defensive));
+            Items.Add(new Item("Seraphs", "Seraph's Embrace", 3040, ItemType.Defensive));
+            Items.Add(new Item("Zhonyas", "Zhonya's Hourglass", 3157, ItemType.Defensive));
             //Cleanse
-            Items.Add(new Item("QSS", "水银饰带", 3140, ItemType.Cleanse));
-            Items.Add(new Item("Mercurial", "水银弯刀", 3139, ItemType.Cleanse));
+            Items.Add(new Item("QSS", "Quicksilver Sash", 3140, ItemType.Cleanse));
+            Items.Add(new Item("Mercurial", "Mercurial Scimitar", 3139, ItemType.Cleanse));
 
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }

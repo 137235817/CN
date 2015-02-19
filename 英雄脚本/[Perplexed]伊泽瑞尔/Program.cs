@@ -53,7 +53,7 @@ namespace PerplexedEzreal
         {
             if ((Config.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || Config.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) && Config.LastHitQ)
             {
-                foreach (var minionDie in MinionManager.GetMinions(SpellManager.Q.Range).Where(minion => target.NetworkId != minion.NetworkId && minion.IsEnemy && HealthPrediction.GetHealthPrediction(minion, (int)((Player.AttackDelay * 1000) * 2.65f ), 0) <= 0 && SpellManager.Q.GetDamage(minion) >= minion.Health && SpellManager.Q.IsReady()))
+                foreach (var minionDie in MinionManager.GetMinions(SpellManager.Q.Range).Where(minion => target.NetworkId != minion.NetworkId && minion.IsEnemy && HealthPrediction.GetHealthPrediction(minion, (int)((Player.AttackDelay * 1000) * 2.65f  + Game.Ping / 2), 0) <= 0 && SpellManager.Q.GetDamage(minion) >= minion.Health && SpellManager.Q.IsReady()))
                     SpellManager.CastSpell(SpellManager.Q, minionDie, HitChance.High, Config.UsePackets);
             }
         }

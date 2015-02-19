@@ -42,7 +42,7 @@ namespace PerplexedEzreal
 
         public static void UseHealIfInDanger(double incomingDmg)
         {
-            if (Config.UseHeal)
+            if (Config.UseHeal && !Player.InFountain())
             {
                 int healthToUse = (int)(Player.MaxHealth / 100) * Config.HealPct;
                 if ((Player.Health - incomingDmg) <= healthToUse)

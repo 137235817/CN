@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-using LeagueSharp;
+
 using LeagueSharp.Common;
 
 using Color = System.Drawing.Color;
@@ -86,12 +82,12 @@ namespace Kalista
             subMenu = _menu.MainMenu.AddSubMenu("其他");
             ProcessLink("miscKillstealE", subMenu.AddLinkedBool("使用E击杀"));
             ProcessLink("miscBigE", subMenu.AddLinkedBool("小兵数量多时使用E"));
-            ProcessLink("miscUseR", subMenu.AddLinkedBool("使用大招拯救被控辅助"));
+            ProcessLink("miscUseR", subMenu.AddLinkedBool("使用大招拯救辅助"));
+            ProcessLink("miscAutoE", subMenu.AddLinkedBool("当平A不能补刀时使用E"));
 
             // Spell settings
             subMenu = _menu.MainMenu.AddSubMenu("技能设置");
             ProcessLink("spellReductionE", subMenu.AddLinkedSlider("E伤害削弱", 20));
-
             // Items
             subMenu = _menu.MainMenu.AddSubMenu("物品");
             ProcessLink("itemsCutlass", subMenu.AddLinkedBool("使用比尔吉沃特弯刀"));
@@ -111,7 +107,6 @@ namespace Kalista
             subMenu = _menu.MainMenu.AddSubMenu("Vee汉化"); 
 			
             Game.PrintChat("澶嶄粐涔嬬煕-鍔犺浇鎴愬姛   Vee姹夊寲!");
-			
         }
     }
 }

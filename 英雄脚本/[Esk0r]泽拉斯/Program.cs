@@ -63,7 +63,7 @@ namespace Xerath
             {
                 return ObjectManager.Player.HasBuff("XerathLocusOfPower2", true) ||
                        (ObjectManager.Player.LastCastedSpellName() == "XerathLocusOfPower2" &&
-                        Environment.TickCount - ObjectManager.Player.LastCastedSpellT() < 500);
+                        Utils.TickCount - ObjectManager.Player.LastCastedSpellT() < 500);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Xerath
             Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "使用E").SetValue(true));
             Config.SubMenu("Combo")
                 .AddItem(
-                    new MenuItem("ComboActive","连招").SetValue(
+                    new MenuItem("ComboActive", "连招").SetValue(
                         new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             //Misc
@@ -140,7 +140,6 @@ namespace Xerath
             Config.SubMenu("R").AddItem(new MenuItem("BlockMovement", "右键暂停R").SetValue(false));
             Config.SubMenu("R").AddItem(new MenuItem("OnlyNearMouse", "R优先攻击鼠标附近的敌人").SetValue(false));
             Config.SubMenu("R").AddItem(new MenuItem("MRadius", "R半径").SetValue(new Slider(700, 1500, 300)));
-
             //Harass menu:
             Config.AddSubMenu(new Menu("骚扰", "Harass"));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "使用Q").SetValue(true));
@@ -151,7 +150,7 @@ namespace Xerath
                         new KeyBind(Config.Item("Farm").GetValue<KeyBind>().Key, KeyBindType.Press)));
             Config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("HarassActiveT", "骚扰(自动)!").SetValue(new KeyBind("Y".ToCharArray()[0],
+                    new MenuItem("HarassActiveT", "骚扰(自动)").SetValue(new KeyBind("Y".ToCharArray()[0],
                         KeyBindType.Toggle)));
 
             //Farming menu:
@@ -159,11 +158,11 @@ namespace Xerath
             Config.SubMenu("Farm")
                 .AddItem(
                     new MenuItem("UseQFarm", "使用Q").SetValue(
-                        new StringList(new[] { "控线", "清线", "都使用", "不使用" }, 2)));
+                        new StringList(new[] { "控线", "清线", "都用", "不用" }, 2)));
             Config.SubMenu("Farm")
                 .AddItem(
                     new MenuItem("UseWFarm", "使用W").SetValue(
-                        new StringList(new[] { "控线", "清线", "都使用", "不使用" }, 1)));
+                        new StringList(new[] {  "控线", "清线", "都用", "不用" }, 1)));
             Config.SubMenu("Farm")
                 .AddItem(
                     new MenuItem("FreezeActive", "控线").SetValue(
@@ -198,7 +197,7 @@ namespace Xerath
             };
 
             //Drawings menu:
-            Config.AddSubMenu(new Menu("范围显示", "Drawings"));
+            Config.AddSubMenu(new Menu("显示", "Drawings"));
             Config.SubMenu("Drawings")
                 .AddItem(
                     new MenuItem("QRange", "Q范围").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
@@ -284,7 +283,7 @@ namespace Xerath
                 }
                 else if (args.SData.Name == "xerathlocuspulse")
                 {
-                    RCharge.CastT = Environment.TickCount;
+                    RCharge.CastT = Utils.TickCount;
                     RCharge.Index++;
                     RCharge.Position = args.End;
                     RCharge.TapKeyPressed = false;
@@ -319,13 +318,13 @@ namespace Xerath
                     E.Cast(eTarget);
             }
 
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && qTarget != null)
             {
                 if (Q.IsCharging)
                 {
                     Q.Cast(qTarget, false, false);
                 }
-                else if (qTarget != null && (!useW || !W.IsReady() || Player.Distance(qTarget) > W.Range))
+                else if (!useW || !W.IsReady() || Player.Distance(qTarget) > W.Range)
                 {
                     Q.StartCharging();
                 }
@@ -377,10 +376,10 @@ namespace Xerath
             {
                 //Wait at least 0.6f if the target is going to die or if the target is to far away
                 if(rTarget.Health - R.GetDamage(rTarget) < 0)
-                    if (Environment.TickCount - RCharge.CastT <= 700) return;
+                    if (Utils.TickCount - RCharge.CastT <= 700) return;
 
                 if ((RCharge.Index != 0 && rTarget.Distance(RCharge.Position) > 1000))
-                    if (Environment.TickCount - RCharge.CastT <= Math.Min(2500, rTarget.Distance(RCharge.Position) - 1000)) return;
+                    if (Utils.TickCount - RCharge.CastT <= Math.Min(2500, rTarget.Distance(RCharge.Position) - 1000)) return;
 
                 switch (rMode)
                 {
@@ -390,7 +389,7 @@ namespace Xerath
 
                     case 1://Selected delays.
                         var delay = Config.Item("Delay" + (RCharge.Index + 1)).GetValue<Slider>().Value;
-                        if (Environment.TickCount - RCharge.CastT > delay)
+                        if (Utils.TickCount - RCharge.CastT > delay)
                             R.Cast(rTarget, true);
                         break;
 
@@ -473,8 +472,8 @@ namespace Xerath
 
         private static void Ping(Vector2 position)
         {
-            if (Environment.TickCount - LastPingT < 30 * 1000) return;
-            LastPingT = Environment.TickCount;
+            if (Utils.TickCount - LastPingT < 30 * 1000) return;
+            LastPingT = Utils.TickCount;
             PingLocation = position;
             SimplePing();
             Utility.DelayAction.Add(150, SimplePing);

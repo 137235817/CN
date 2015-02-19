@@ -68,6 +68,7 @@ namespace Oracle.Extensions
             // slow removers
             CreateMenuItem(0, "evelynnw", "暗黑狂暴(寡妇)", "eveslow", SpellSlot.W, false);
             CreateMenuItem(0, "garenq", "致命打击(盖伦)", "garenslow", SpellSlot.Q, false);
+            CreateMenuItem(0, "highlander", "Highlander", "masteryislow", SpellSlot.R, false);
 
             // untargetable/evade spells           
             CreateMenuItem(0, "judicatorintervention", "神圣庇护(天使)", "teamkaylezhonya", SpellSlot.R, false);
@@ -89,6 +90,7 @@ namespace Oracle.Extensions
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            // prevent errors before spawning to the rift or dead
             if (!Me.IsValidTarget(300, false))
             {
                 return;
@@ -97,6 +99,7 @@ namespace Oracle.Extensions
             // slow removals
             UseSpell("garenq", "garenslow", float.MaxValue, false);
             UseSpell("evelynnw", "eveslow", float.MaxValue, false);
+            UseSpell("highlander", "masteryislow", float.MaxValue, false);
 
             // spell shields
             UseSpellShield("blackshield", "teammorganazhonyaCC", 600f);
@@ -362,7 +365,7 @@ namespace Oracle.Extensions
                                         .OrderByDescending(ene => ene.Health/ene.MaxHealth*100))
                             {
                                 spell.CastOnUnit(ene);
-                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
+                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(DS) on " + ene.SkinName);
                                 OC.Logger(OC.LogType.Info, "Evade target info: ");
                                 OC.Logger(OC.LogType.Info, "HP %: " + ene.Health/ene.MaxHealth*100);
                                 OC.Logger(OC.LogType.Info, "Current HP %: " + ene.Health);
@@ -381,15 +384,14 @@ namespace Oracle.Extensions
                     {
                         spell.CastOnUnit(target);
                         OC.Logger(Program.LogType.Action,
-                            "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + target.SkinName + " (" +
-                            aHealthPercent + "%)");
+                            "(Evade) Casting " + spell.Slot + "(DS) on " + target.SkinName + " (" + aHealthPercent + "%)");
                     }
                 }
 
                 if ((OC.DangerUlt || OC.IncomeDamage >= target.Health || target.Health/target.MaxHealth*100 <= 18) &&
                     menuvar.Contains("hero"))
                 {
-                    if (Me.CountHerosInRange(true) > Me.CountHerosInRange(false))
+                    if (Me.CountHerosInRange(false) + 1 > Me.CountHerosInRange(true))
                     {
                         if (OC.AggroTarget.NetworkId == Me.NetworkId)
                         {
@@ -400,7 +402,7 @@ namespace Oracle.Extensions
                                         .OrderByDescending(ene => ene.Health/ene.MaxHealth*100))
                             {
                                 spell.CastOnUnit(ene);
-                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(Dangerous Spell) on " + ene.SkinName);
+                                OC.Logger(Program.LogType.Action, "(Evade) Casting " + spell.Slot + "(DS) on " + ene.SkinName);
                                 OC.Logger(OC.LogType.Info, "Evade target info: ");
                                 OC.Logger(OC.LogType.Info, "HP %: " + ene.Health / ene.MaxHealth * 100);
                                 OC.Logger(OC.LogType.Info, "Current HP %: " + ene.Health);
@@ -419,16 +421,18 @@ namespace Oracle.Extensions
             var slot = Me.GetSpellSlot(sdataname);        
             if (slot != SpellSlot.Unknown && !_mainMenu.Item("use" + menuvar).GetValue<bool>())
                 return;
-
-            
+         
             var spell = new Spell(slot, range);
             var target = range < 5000 ? OC.Friendly() : Me;
 
             if (target.Distance(Me.ServerPosition, true) > range*range)
                 return;
-      
-            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
+
+            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() ||
+                Me.IsRecalling() ||  Me.InFountain())
+            {
                 return;
+            }
          
             var manaPercent = (int) (Me.Mana/Me.MaxMana*100);
             var mHealthPercent = (int)(Me.Health / Me.MaxHealth * 100);
@@ -438,8 +442,7 @@ namespace Oracle.Extensions
             if (menuvar.Contains("slow") && Me.HasBuffOfType(BuffType.Slow))
             {
                 spell.Cast();
-                OC.Logger(Program.LogType.Action,
-                    "(Auto Spell: Slow) Im slowed, casting " + spell.Slot);
+                OC.Logger(Program.LogType.Action,  "(Auto Spell: Slow) Im slowed, casting " + spell.Slot);
             }
 
             if (menuvar.Contains("slow")) 
@@ -494,13 +497,12 @@ namespace Oracle.Extensions
                 if (usemana && manaPercent <= _mainMenu.Item("use" + menuvar + "Mana").GetValue<Slider>().Value)
                     return;
 
-                if (Me.ChampionName == "Sona") 
+                if (OC.ChampionName == "Sona") 
                     spell.Cast(); 
                 else
                 {
                     spell.Cast(target);
-                    OC.Logger(OC.LogType.Action,
-                        "(Auto Spell: Heal) Casting " + spell.Slot + " on " + target.SkinName + " (Low HP)");
+                    OC.Logger(OC.LogType.Action, "(Auto Spell: Heal) Casting " + spell.Slot + " on " + target.SkinName + " (Low HP)");
                     OC.Logger(OC.LogType.Action, "Target HP %: " + aHealthPercent);
                 }
             }
@@ -510,8 +512,7 @@ namespace Oracle.Extensions
                 if (iDamagePercent >= _mainMenu.Item("use" + menuvar + "Dmg").GetValue<Slider>().Value)
                 {
                     spell.Cast(target);
-                    OC.Logger(OC.LogType.Action,
-                        "(Auto Spell: Shield) Casting " + spell.Slot + " on " + target.SkinName + " (Damage Chunk)");
+                    OC.Logger(OC.LogType.Action, "(SS) Casting " + spell.Slot + " on " + target.SkinName + " (Damage Chunk)");
                     OC.Logger(OC.LogType.Action, "Target HP %: " + aHealthPercent);
                 }
             }

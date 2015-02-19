@@ -42,11 +42,14 @@ namespace KurisuMorgana
             TargetSelector.AddToMenu(tsmenu);
             _menu.AddSubMenu(tsmenu);
 
-            var drmenu = new Menu("显示设置", "drawings");
-            drmenu.AddItem(new MenuItem("drawq", "显示Q范围")).SetValue(true);
-            drmenu.AddItem(new MenuItem("draww", "显示W范围")).SetValue(true);
-            drmenu.AddItem(new MenuItem("drawe", "显示E范围")).SetValue(true);
-            drmenu.AddItem(new MenuItem("drawr", "显示R范围")).SetValue(true);
+            var drmenu = new Menu("显示", "drawings");
+            drmenu.AddItem(new MenuItem("drawq", "Q范围")).SetValue(true);
+            drmenu.AddItem(new MenuItem("draww", "W范围")).SetValue(true);
+            drmenu.AddItem(new MenuItem("drawe", "E范围")).SetValue(true);
+            drmenu.AddItem(new MenuItem("drawr", "R范围")).SetValue(true);
+            drmenu.AddItem(new MenuItem("drawkill", "显示可击杀")).SetValue(true);
+            drmenu.AddItem(new MenuItem("drawtarg", "显示目标")).SetValue(true);
+            drmenu.AddItem(new MenuItem("debugdmg", "调试连招伤害")).SetValue(false);
             _menu.AddSubMenu(drmenu);
 
             var spellmenu = new Menu("技能设置", "spells");
@@ -66,16 +69,17 @@ namespace KurisuMorgana
             menuW.AddItem(new MenuItem("useharassw", "骚扰使用W")).SetValue(true);       
             menuW.AddItem(new MenuItem("usewauto", "稳定释放")).SetValue(true);
             menuW.AddItem(new MenuItem("waitfor", "等待Q命中或稳定释放")).SetValue(true);
+            menuW.AddItem(new MenuItem("calcw", "标记计算")).SetValue(new Slider(3, 1, 5));
             spellmenu.AddSubMenu(menuW);
 
             var menuR = new Menu("R设置", "rmenu");
             menuR.AddItem(new MenuItem("usercombo", "启用")).SetValue(true);
-            //menuR.AddItem(new MenuItem("autor", "Use automatic if enemies >= ")).SetValue(new Slider(4, 2, 5));
-            menuR.AddItem(new MenuItem("rcount", "敌人数量 >=使用 ")).SetValue(new Slider(2, 1, 5));
-            menuR.AddItem(new MenuItem("ronlyif", "主要目标可被命中时使用")).SetValue(true);
+            menuR.AddItem(new MenuItem("rkill", "可击杀是在连招中使用")).SetValue(true);
+            menuR.AddItem(new MenuItem("rcount", "敌方>=在连招中使用 ")).SetValue(new Slider(3, 1, 5));
+            menuR.AddItem(new MenuItem("useautor", "敌人 >=自动使用 ")).SetValue(new Slider(4, 2, 5));
             spellmenu.AddSubMenu(menuR);
 
-            spellmenu.AddItem(new MenuItem("harassmana", "骚扰法力值控制%")).SetValue(new Slider(55, 0, 99));
+            spellmenu.AddItem(new MenuItem("harassmana", "骚扰法力值控制")).SetValue(new Slider(55, 0, 99));
             _menu.AddSubMenu(spellmenu);
             _menu.AddToMainMenu();
 
@@ -94,10 +98,17 @@ namespace KurisuMorgana
                 return;
             }
 
-            Dashing(_menu.Item("useqdash").GetValue<bool>());
+            CheckDamage(TargetSelector.GetTarget(_q.Range + 10, TargetSelector.DamageType.Magical));
 
-            Immobile(_menu.Item("useqauto").GetValue<bool>(),
-                     _menu.Item("usewauto").GetValue<bool>());
+            if (Me.CountEnemiesInRange(_r.Range) >= _menu.Item("useautor").GetValue<Slider>().Value)
+            {
+                if (_r.IsReady())
+                    _r.Cast();
+            }
+       
+
+            Dashing(_menu.Item("useqdash").GetValue<bool>());
+            Immobile(_menu.Item("useqauto").GetValue<bool>(), _menu.Item("usewauto").GetValue<bool>());
 
             if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
             {
@@ -117,6 +128,7 @@ namespace KurisuMorgana
         {
             if (Me.IsValidTarget(300, false))
             {
+                var ticks = _menu.Item("calcw").GetValue<Slider>().Value;
                 Render.Circle.DrawCircle(Me.Position, Me.BoundingRadius - 50, System.Drawing.Color.White, 3);
 
                 if (_menu.Item("drawq").GetValue<bool>())
@@ -130,7 +142,34 @@ namespace KurisuMorgana
 
                 var target = TargetSelector.GetTarget(_q.Range + 10, TargetSelector.DamageType.Magical);
                 if (target.IsValidTarget(_q.Range + 10))
-                    Render.Circle.DrawCircle(target.Position, target.BoundingRadius - 50, System.Drawing.Color.Yellow, 3);
+                {
+                    if (_menu.Item("drawtarg").GetValue<bool>())
+                    {
+                        Render.Circle.DrawCircle(target.Position, target.BoundingRadius - 50, System.Drawing.Color.Yellow, 6);                       
+                    }
+
+                    if (_menu.Item("drawkill").GetValue<bool>())
+                    {
+                        var wts = Drawing.WorldToScreen(target.Position);
+                        if (_ma*3 + _mi + _mq + _guise >= target.Health)
+                            Drawing.DrawText(wts[0] - 20, wts[1] + 20, System.Drawing.Color.LimeGreen, "Q Kill!");
+                        else if (_ma*3 + _mi + _mw*3 + _guise >= target.Health)
+                            Drawing.DrawText(wts[0] - 20, wts[1] + 20, System.Drawing.Color.LimeGreen, "W Kill!");
+                        else if (_mq + _mw * ticks + _ma * 3 + _mi + _guise >= target.Health)
+                            Drawing.DrawText(wts[0] - 20, wts[1] + 20, System.Drawing.Color.LimeGreen, "Q + W Kill!");
+                        else if (_mq + _mw * ticks + _ma * 3 + _mi + _mr + _guise >= target.Health)
+                            Drawing.DrawText(wts[0] - 20, wts[1] + 20, System.Drawing.Color.LimeGreen, "Q + R + W Kill!");
+                        else if (_mq + _mw * ticks + _ma * 3 + _mr + _mi + _guise < target.Health)
+                            Drawing.DrawText(wts[0] - 20, wts[1] + 20, System.Drawing.Color.LimeGreen, "Cant Kill");
+                    }
+
+                    if (_menu.Item("debugdmg").GetValue<bool>())
+                    {
+                        var wts = Drawing.WorldToScreen(target.Position);
+                        Drawing.DrawText(wts[0] - 75, wts[1] + 40, System.Drawing.Color.Yellow,
+                                "Combo Damage: " + (float)(_ma * 3 + _mq + _mw * ticks + _mi + _mr + _guise));
+                    }
+                }
             }
         }
 
@@ -150,8 +189,8 @@ namespace KurisuMorgana
             }
 
             if (usew && _w.IsReady())
-            {
-                var wtarget = TargetSelector.GetTarget(_w.Range + 10, TargetSelector.DamageType.Magical);
+            {             
+                var wtarget = TargetSelector.GetTarget(_w.Range + 10, TargetSelector.DamageType.Magical);            
                 if (wtarget.IsValidTarget(_w.Range))
                 {
                     var poutput = _w.GetPrediction(wtarget);
@@ -165,16 +204,18 @@ namespace KurisuMorgana
 
             if (user && _r.IsReady())
             {
+                var ticks = _menu.Item("calcw").GetValue<Slider>().Value;
                 var rtarget = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                 if (rtarget.IsValidTarget(_r.Range))
                 {
+                    if (_mr + _mq + _mw + _ma * ticks + _mi + _guise >= rtarget.Health)
+                    {
+                        if (_menu.Item("rkill").GetValue<bool>())
+                            _r.Cast();
+                    }
+
                     if (Me.CountEnemiesInRange(_r.Range) >= _menu.Item("rcount").GetValue<Slider>().Value)
                     {
-                        if (_menu.Item("ronlyif").GetValue<bool>() && !rtarget.IsImmovable)
-                        {
-                            return;
-                        }
-
                         _r.Cast();
                     }
                 }
@@ -272,6 +313,33 @@ namespace KurisuMorgana
                     }
                 }
             }
+        }
+
+        private static float _mq, _mw, _mr;
+        private static float _ma, _mi, _guise;
+        private static void CheckDamage(Obj_AI_Base target)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            var qready = Me.Spellbook.CanUseSpell(SpellSlot.Q) == SpellState.Ready;
+            var wready = Me.Spellbook.CanUseSpell(SpellSlot.W) == SpellState.Ready;
+            var rready = Me.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready;
+            var iready = Me.Spellbook.CanUseSpell(Me.GetSpellSlot("summonerdot")) == SpellState.Ready;
+
+            _ma = (float) Me.GetAutoAttackDamage(target);
+            _mq = (float) (qready ? Me.GetSpellDamage(target, SpellSlot.Q) : 0);
+            _mw = (float) (wready ? Me.GetSpellDamage(target, SpellSlot.W) : 0);
+            _mr = (float) (rready ? Me.GetSpellDamage(target, SpellSlot.R) : 0);
+            _mi = (float) (iready ? Me.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) : 0);
+
+            _guise = (float) (Items.HasItem(3151)
+                ? Me.GetItemDamage(target, Damage.DamageItems.LiandrysTorment)
+                : 0);
+
+
         }
     }
 }

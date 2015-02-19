@@ -1,185 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using LeagueSharp;
 using LeagueSharp.Common;
+using LeagueSharp;
 using SharpDX;
 using Color = System.Drawing.Color;
 
 namespace VayneHunterRework
 {
-    internal class VayneHunterRework
+    class VayneHunterRework
     {
         public static Orbwalking.Orbwalker COrbwalker;
         public static Obj_AI_Hero Player = ObjectManager.Player;
-        public static String CharName = "Vayne";
+        public static String charName = "Vayne";
         public static Spell Q, W, E, R;
         public static Menu Menu;
         public static Vector3 AfterCond = Vector3.Zero;
-        public static AttackableUnit Current; // for tower farming
-        public static AttackableUnit Last; // for tower farming
-        private static float _lastMoveC;
-        private static bool _aLInit;
-        private static readonly int[] Qwe = { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-        private static readonly int[] Qew = { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-        private static readonly int[] Wqe = { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-        private static readonly int[] Weq = { 1, 3, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-        private static readonly int[] Eqw = { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-        private static readonly int[] Ewq = { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+        public static AttackableUnit current; // for tower farming
+        public static AttackableUnit last; // for tower farming
+        private static float LastMoveC;
+        private static bool aLInit;
+        private static int[] QWE =  { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+        private static int[] QEW =  { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+        private static int[] WQE =  { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+        private static int[] WEQ =  { 1, 3, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+        private static int[] EQW =  { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+        private static int[] EWQ =  { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
 
-        private static readonly StringList Orders = new StringList(
-            new[] { "QWE", "QEW", "WQE", "WEQ", "EQW", "EWQ" }, 2);
+        private static StringList Orders = new StringList(new [] {"QWE","QEW","WQE","WEQ","EQW","EWQ"},2);
 
         public VayneHunterRework()
         {
-            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
-        }
-
-        private void OrbwalkerAfterAttack(AttackableUnit unit, AttackableUnit target)
-        {
-            if (unit.IsMe)
-            {
-                AfterAa(target);
-            }
-        }
-
-        #region Drawing
-
-        private static void Drawing_OnDraw(EventArgs args)
-        {
-            if (Player.IsDead)
-            {
-                return;
-            }
-
-            var drawE = Menu.Item("DrawE").GetValue<Circle>();
-            var drawCond = Menu.Item("DrawCond").GetValue<Circle>();
-            var drawDrake = Menu.Item("DrawDrake").GetValue<Circle>();
-            var drawMid = Menu.Item("DrawMid").GetValue<Circle>();
-            var midWallQPos = new Vector2(6707.485f, 8802.744f);
-            var drakeWallQPos = new Vector2(11514, 4462);
-            if (drawDrake.Active && Player.Distance(drakeWallQPos) < 1500f && IsSummonersRift())
-            {
-                Utility.DrawCircle(new Vector3(12052, 4826, 0f), 75f, drawDrake.Color);
-            }
-
-            if (drawMid.Active && Player.Distance(midWallQPos) < 1500f && IsSummonersRift())
-            {
-                Utility.DrawCircle(new Vector3(6958, 8944, 0f), 75f, drawMid.Color);
-            }
-
-            if (drawE.Active)
-            {
-                Utility.DrawCircle(Player.Position, E.Range, drawE.Color);
-            }
-
-            if (drawCond.Active)
-            {
-                DrawPostCondemn();
-            }
-        }
-
-        #endregion
-
-        private void AfterAa(AttackableUnit target)
-        {
-            if (!(target is Obj_AI_Hero))
-            {
-                return;
-            }
-
-            var tar = (Obj_AI_Hero) target;
-
-            switch (COrbwalker.ActiveMode)
-            {
-                case Orbwalking.OrbwalkingMode.Combo:
-
-                    if (IsMenuEnabled("UseQC"))
-                    {
-                        SmartQCheck(tar);
-                    }
-                    break;
-                case Orbwalking.OrbwalkingMode.Mixed:
-                    if (IsMenuEnabled("UseQH"))
-                    {
-                        SmartQCheck(tar);
-                    }
-                    break;
-            }
-
-            ENextAuto(tar);
-            UseItems(tar);
-        }
-
-        private static void Game_OnGameUpdate(EventArgs args)
-        {
-            //Cleanser.enableCheck();
-            if (Player.IsDead)
-            {
-                return;
-            }
-
-            Obj_AI_Hero tar;
-
-            if (IsMenuEnabled("AutoE") && CondemnCheck(Player.Position, out tar))
-            {
-                CastE(tar, true);
-            }
-
-            if (Menu.Item("WallTumble").GetValue<KeyBind>().Active)
-            {
-                WallTumble();
-            }
-
-            if (Menu.Item("ThreshLantern").GetValue<KeyBind>().Active)
-            {
-                TakeLantern();
-            }
-
-            QFarmCheck();
-            FocusTarget();
-            NoAaStealth();
-            EKs();
-
-            AutoPot();
-
-            //Cleanser
-            Cleanser.CleanserByBuffType();
-            Cleanser.CleanserBySpell();
-
-
-            switch (COrbwalker.ActiveMode)
-            {
-                case Orbwalking.OrbwalkingMode.Combo:
-                    Obj_AI_Hero tar2;
-                    if (IsMenuEnabled("UseEC") && CondemnCheck(Player.ServerPosition, out tar2))
-                    {
-                        CastE(tar2);
-                    }
-
-                    UseIgnite();
-                    break;
-                case Orbwalking.OrbwalkingMode.Mixed:
-                    Obj_AI_Hero tar3;
-                    if (IsMenuEnabled("UseEH") && CondemnCheck(Player.ServerPosition, out tar3))
-                    {
-                        CastE(tar3);
-                    }
-                    break;
-            }
+            CustomEvents.Game.OnGameLoad +=Game_OnGameLoad;
         }
 
         private void Game_OnGameLoad(EventArgs args)
         {
-            if (Player.ChampionName != CharName)
-            {
-                return;
-            }
-
-            Cleanser.CreateQssSpellList();
+            if (Player.ChampionName != charName) return;
+            Cleanser.CreateQSSSpellList();
 
             #region Menu
-
             Menu = new Menu("暗夜猎手-薇恩", "VHRework", true);
             var orbMenu = new Menu("走砍", "orbwalker");
             COrbwalker = new Orbwalking.Orbwalker(orbMenu);
@@ -192,86 +51,85 @@ namespace VayneHunterRework
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseQC", "使用Q")).SetValue(true);
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseEC", "使用E").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseRC", "使用R").SetValue(false));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1)));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1)));
-            Menu.SubMenu("Combo")
-                .AddItem(new MenuItem("NEnUlt", "当敌人多于x时使用大招").SetValue(new Slider(2, 1, 5)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("NEnUlt", "当敌人多于x时使用大招").SetValue(new Slider(2, 1, 5)));
 
             Menu.AddSubMenu(new Menu("骚扰", "Harrass"));
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseQH", "使用Q")).SetValue(true);
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseEH", "使用E").SetValue(true));
-            Menu.SubMenu("Harrass").AddItem(new MenuItem("QManaH", "Q法力值控制%").SetValue(new Slider(35, 1)));
-            Menu.SubMenu("Harrass").AddItem(new MenuItem("EManaH", "E法力值控制%").SetValue(new Slider(20, 1)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
 
             Menu.AddSubMenu(new Menu("补兵", "Farm"));
             Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLH", "使用Q补刀")).SetValue(true);
             Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLC", "使用Q清线")).SetValue(true);
-            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLH", "补刀Q法力值控制%").SetValue(new Slider(35, 1)));
-            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLC", "清线Q法力值控制%").SetValue(new Slider(35, 1)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
 
-            var miscSubMenu = new Menu("其他", "Misc");
+            var MiscSubMenu = new Menu("其他", "Misc");
 
-            var miscTSubMenu = new Menu("其他 - 翻滚设置", "MiscT");
+            var MiscTSubMenu = new Menu("其他 - 翻滚设置", "MiscT");
             {
                 miscTSubMenu.AddItem(new MenuItem("SmartQ", "优先QE").SetValue(false));
                 miscTSubMenu.AddItem(new MenuItem("NoQEn", "不往人堆里Q").SetValue(true));
                 miscTSubMenu.AddItem(new MenuItem("NoAAStealth", "潜行时不使用平A").SetValue(false));
-                miscTSubMenu.AddItem(
-                    new MenuItem("WallTumble", "翻滚过墙").SetValue(
-                        new KeyBind("Y".ToCharArray()[0], KeyBindType.Press)));
+                MiscTSubMenu
+                    .AddItem(
+                        new MenuItem("WallTumble", "翻墙").SetValue(new KeyBind("Y".ToCharArray()[0],
+                            KeyBindType.Press)));
             }
-            var miscCSubMenu = new Menu("其他 - E设置", "MiscC");
+            var MiscCSubMenu = new Menu("其他 - E设置", "MiscC");
             {
-                miscCSubMenu.AddItem(
-                    new MenuItem("ENext", "手动按键E墙").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
-                miscCSubMenu.AddItem(new MenuItem("PushDistance", "E推进距离").SetValue(new Slider(425, 400, 500)));
+                MiscCSubMenu.AddItem(new MenuItem("ENext", "手动按键E墙").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+                miscCSubMenu.AddItem(new MenuItem("PushDistance", "E推开距离").SetValue(new Slider(425, 400, 500)));
                 miscCSubMenu.AddItem(new MenuItem("CondemnTurret", "尝试E到塔上").SetValue(false));
                 miscCSubMenu.AddItem(new MenuItem("CondemnFlag", "E到皇子的旗帜上").SetValue(true));
                 miscCSubMenu.AddItem(new MenuItem("AutoE", "自动E").SetValue(true));
                 miscCSubMenu.AddItem(new MenuItem("AutoEKS", "智能使用E击杀").SetValue(true));
                 miscCSubMenu.AddItem(new MenuItem("NoEEnT", "敌方塔下不使用E").SetValue(true));
             }
-            var miscGSubMenu = new Menu("其他 - 一般", "MiscG");
+            var MiscGSubMenu = new Menu("其他 - 一般", "MiscG");
             {
+
                 miscGSubMenu.AddItem(new MenuItem("Packets", "封包释放").SetValue(true));
                 miscGSubMenu.AddItem(new MenuItem("AntiGP", "防突进")).SetValue(true);
                 miscGSubMenu.AddItem(new MenuItem("Interrupt", "打断技能").SetValue(true));
-                miscGSubMenu.AddItem(new MenuItem("SpecialFocus", "优先攻击W标记两次以上目标").SetValue(false));
-                miscGSubMenu.AddItem(
-                    new MenuItem("ThreshLantern", "点锤石灯笼").SetValue(
-                        new KeyBind("S".ToCharArray()[0], KeyBindType.Press)));
-                miscGSubMenu.AddItem(new MenuItem("UseIgn", "使用引燃")).SetValue(true);
+                MiscGSubMenu
+                    .AddItem(new MenuItem("SpecialFocus", "优先攻击W标记两次以上目标").SetValue(false));
+                MiscGSubMenu
+                    .AddItem(
+                        new MenuItem("ThreshLantern", "点锤石灯笼").SetValue(new KeyBind("S".ToCharArray()[0],
+                            KeyBindType.Press)));
+                MiscGSubMenu.AddItem(new MenuItem("UseIgn", "使用点燃")).SetValue(true);
             }
-            miscSubMenu.AddSubMenu(miscTSubMenu);
-            miscSubMenu.AddSubMenu(miscCSubMenu);
-            miscSubMenu.AddSubMenu(miscGSubMenu);
-            Menu.AddSubMenu(miscSubMenu);
+            MiscSubMenu.AddSubMenu(MiscTSubMenu);
+            MiscSubMenu.AddSubMenu(MiscCSubMenu);
+            MiscSubMenu.AddSubMenu(MiscGSubMenu);
+            Menu.AddSubMenu(MiscSubMenu);
 
-            Menu.AddSubMenu(new Menu("草丛探测", "BushReveal"));
+            Menu.AddSubMenu(new Menu("[VH] BushRevealer", "BushReveal"));
             //Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushReveal", "Bush Revealer").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Toggle)));
-            Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushRevealer", "E进草丛自动插眼").SetValue(true));
+            Menu.SubMenu("BushReveal").AddItem(new MenuItem("BushRevealer", "Trinket bush on condemn").SetValue(true));
 
             Menu.AddSubMenu(new Menu("物品", "Items"));
             Menu.SubMenu("Items").AddItem(new MenuItem("BotrkC", "连招使用破败").SetValue(true));
-            Menu.SubMenu("Items").AddItem(new MenuItem("BotrkH", "消耗使用破败").SetValue(false));
+            Menu.SubMenu("Items").AddItem(new MenuItem("BotrkH", "骚扰使用破败").SetValue(false));
             Menu.SubMenu("Items").AddItem(new MenuItem("YoumuuC", "连招使用幽梦").SetValue(true));
-            Menu.SubMenu("Items").AddItem(new MenuItem("YoumuuH", "消耗使用幽梦").SetValue(false));
+            Menu.SubMenu("Items").AddItem(new MenuItem("YoumuuH", "骚扰使用幽梦").SetValue(false));
             Menu.SubMenu("Items").AddItem(new MenuItem("BilgeC", "连招使用弯刀").SetValue(true));
-            Menu.SubMenu("Items").AddItem(new MenuItem("BilgeH", "消耗使用弯刀").SetValue(false));
-            Menu.SubMenu("Items")
-                .AddItem(new MenuItem("OwnHPercBotrk", "自己血量低于（%）使用破败").SetValue(new Slider(50, 1)));
-            Menu.SubMenu("Items")
-                .AddItem(new MenuItem("EnHPercBotrk", "敌人血量低于（%）使用破败").SetValue(new Slider(20, 1)));
+            Menu.SubMenu("Items").AddItem(new MenuItem("BilgeH", "骚扰使用弯刀").SetValue(false));
+            Menu.SubMenu("Items").AddItem(new MenuItem("OwnHPercBotrk", "自己血量低于（%）使用破败").SetValue(new Slider(50, 1, 100)));
+            Menu.SubMenu("Items").AddItem(new MenuItem("EnHPercBotrk", "敌人血量低于（%）使用破败").SetValue(new Slider(20, 1, 100)));
 
             Menu.AddSubMenu(new Menu("水银饰带", "QSSMenu"));
             Menu.SubMenu("QSSMenu").AddItem(new MenuItem("UseQSS", "使用水银饰带解控").SetValue(true));
-            Menu.SubMenu("QSSMenu")
-                .AddItem(new MenuItem("QSSMinBuffs", "最少几个减益技能使用水银").SetValue(new Slider(2, 1, 5)));
+            Menu.SubMenu("QSSMenu").AddItem(new MenuItem("QSSMinBuffs", "最少几个减益技能使用水银").SetValue(new Slider(2,1,5)));
 
             Menu.AddSubMenu(new Menu("净化选项1", "QSST"));
-            Cleanser.CreateTypeQssMenu();
+            Cleanser.CreateTypeQSSMenu();
             Menu.AddSubMenu(new Menu("净化选项2", "QSSSpell"));
-            Cleanser.CreateQssSpellMenu();
+            Cleanser.CreateQSSSpellMenu();
             Menu.AddSubMenu(new Menu("不E", "NoCondemn"));
             CreateNoCondemnMenu();
 
@@ -288,222 +146,266 @@ namespace VayneHunterRework
             Menu.SubMenu("AutoLevel").AddItem(new MenuItem("ALAct", "启用").SetValue(false));
 
             Menu.AddSubMenu(new Menu("显示设置", "Draw"));
-            Menu.SubMenu("Draw").AddItem(new MenuItem("DrawE", "显示E范围").SetValue(new Circle(true, Color.MediumPurple)));
-            Menu.SubMenu("Draw")
-                .AddItem(new MenuItem("DrawCond", "显示击晕后位置").SetValue(new Circle(true, Color.Red)));
-            Menu.SubMenu("Draw")
-                .AddItem(new MenuItem("DrawDrake", "显示翻墙点1").SetValue(new Circle(true, Color.WhiteSmoke)));
-            Menu.SubMenu("Draw")
-                .AddItem(new MenuItem("DrawMid", "显示翻墙点2").SetValue(new Circle(true, Color.WhiteSmoke)));
+            Menu.SubMenu("Draw").AddItem(new MenuItem("DrawE", "E范围").SetValue(new Circle(true,Color.MediumPurple)));
+            Menu.SubMenu("Draw").AddItem(new MenuItem("DrawCond", "显示击晕后位置").SetValue(new Circle(true, Color.Red)));
+            Menu.SubMenu("Draw").AddItem(new MenuItem("DrawDrake", "显示翻墙点1").SetValue(new Circle(true, Color.WhiteSmoke)));
+            Menu.SubMenu("Draw").AddItem(new MenuItem("DrawMid", "显示翻墙点1").SetValue(new Circle(true, Color.WhiteSmoke)));
 
             Menu.AddToMainMenu();
-
             #endregion
 
             Game.PrintChat("<font color='#FF0000'>VayneHunter</font> <font color='#FFFFFF'>鍔犺浇鎴愬姛!!</font>");
-            Game.PrintChat(
-                "By <font color='#FF0000'>DZ</font><font color='#FFFFFF'>191</font>. Special Thanks to: Kurisuu & KonoeChan");
+            Game.PrintChat("By <font color='#FF0000'>DZ</font><font color='#FFFFFF'>191</font>. Special Thanks to: Kurisuu & KonoeChan");
             Game.PrintChat("If you like my assemblies feel free to donate me (link on the forum :) )");
 
-            //Cleanser.cleanUselessSpells();
+           //Cleanser.cleanUselessSpells();
             Q = new Spell(SpellSlot.Q);
-            E = new Spell(SpellSlot.E, 550f);
+            E = new Spell(SpellSlot.E,550f);
             R = new Spell(SpellSlot.R);
-            E.SetTargetted(0.25f, 1600f);
-            Orbwalking.AfterAttack += OrbwalkerAfterAttack;
+            E.SetTargetted(0.25f,1600f);
+            Orbwalking.AfterAttack += Orbwalker_AfterAttack;
             Game.OnGameUpdate += Game_OnGameUpdate;
 
-            // Game.OnGameProcessPacket += GameOnOnGameProcessPacket;
+           // Game.OnGameProcessPacket += GameOnOnGameProcessPacket;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
             GameObject.OnCreate += Cleanser.OnCreateObj;
             GameObject.OnDelete += Cleanser.OnDeleteObj;
-            Menu.Item("ALAct").ValueChanged += AutoLevelValueChanged;
+            Menu.Item("ALAct").ValueChanged += AutoLevel_ValueChanged;
 
             #region AutoLeveler
 
-            if (!IsMenuEnabled("ALAct") || _aLInit)
+            if (isMenuEnabled("ALAct") && !aLInit)
             {
-                return;
-            }
-
-            var autoLevelI =
-                new AutoLevel(
-                    GetSequence(
-                        Menu.Item("ALSeq").GetValue<StringList>().SList[
-                            Menu.Item("ALSeq").GetValue<StringList>().SelectedIndex]));
-            _aLInit = true;
-        }
-
-        private static void AutoLevelValueChanged(object sender, OnValueChangeEventArgs ev)
-        {
-            if (IsMenuEnabled("ALAct") && !_aLInit)
-            {
-                var autoLevelI =
+                var AutoLevel_I =
                     new AutoLevel(
-                        GetSequence(
+                        getSequence(
                             Menu.Item("ALSeq").GetValue<StringList>().SList[
                                 Menu.Item("ALSeq").GetValue<StringList>().SelectedIndex]));
-                _aLInit = true;
+                aLInit = true;
+            }
+        }
+
+        private void AutoLevel_ValueChanged(object sender, OnValueChangeEventArgs ev)
+        {
+            if (isMenuEnabled("ALAct") && !aLInit)
+            {
+                var AutoLevel_I =
+                    new AutoLevel(
+                        getSequence(
+                            Menu.Item("ALSeq").GetValue<StringList>().SList[
+                                Menu.Item("ALSeq").GetValue<StringList>().SelectedIndex]));
+                aLInit = true;
             }
 
             AutoLevel.Enabled(ev.GetNewValue<bool>());
         }
 
+            #endregion
+
+
+
+        private void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            if (unit.IsMe)
+            {
+                 AfterAA(target);
+            }
+        }
+
+        #region Drawing
+        void Drawing_OnDraw(EventArgs args)
+        {
+            if (Player.IsDead) return;
+            var DrawE = Menu.Item("DrawE").GetValue<Circle>();
+            var DrawCond = Menu.Item("DrawCond").GetValue<Circle>();
+            var DrawDrake = Menu.Item("DrawDrake").GetValue<Circle>();
+            var DrawMid = Menu.Item("DrawMid").GetValue<Circle>();
+            Vector2 MidWallQPos = new Vector2(6707.485f, 8802.744f);
+            Vector2 DrakeWallQPos = new Vector2(11514, 4462);
+            if (DrawDrake.Active && Player.Distance(DrakeWallQPos) < 1500f && isSummonersRift()) Utility.DrawCircle(new Vector3(12052, 4826, 0f), 75f, DrawDrake.Color);
+            if (DrawMid.Active && Player.Distance(MidWallQPos) < 1500f && isSummonersRift()) Utility.DrawCircle(new Vector3(6958, 8944, 0f), 75f, DrawMid.Color);
+            if (DrawE.Active) Utility.DrawCircle(Player.Position, E.Range, DrawE.Color);
+            if (DrawCond.Active) DrawPostCondemn();
+
+        }
         #endregion
+
+        void AfterAA(AttackableUnit target)
+        {
+            if (!(target is Obj_AI_Hero)) return;
+            var tar = (Obj_AI_Hero)target;
+
+            switch (COrbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo:
+
+                    if (isMenuEnabled("UseQC")) SmartQCheck(tar);
+                    break;
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    if (isMenuEnabled("UseQH")) SmartQCheck(tar);
+                    break;
+                case Orbwalking.OrbwalkingMode.LastHit:
+
+                default:
+                    break;
+            }
+
+            ENextAuto(tar);
+            UseItems(tar);
+        }
+
+
+        void Game_OnGameUpdate(EventArgs args)
+        {
+            //Cleanser.enableCheck();
+            if (Player.IsDead) return;
+            Obj_AI_Hero tar;
+
+            if (isMenuEnabled("AutoE") && CondemnCheck(Player.Position, out tar)) { CastE(tar,true);}
+            if (Menu.Item("WallTumble").GetValue<KeyBind>().Active) WallTumble();
+            if (Menu.Item("ThreshLantern").GetValue<KeyBind>().Active) takeLantern();
+            QFarmCheck();
+            FocusTarget();
+            NoAAStealth();
+            EKs();
+
+            AutoPot();
+
+            //Cleanser
+            Cleanser.cleanserByBuffType();
+            Cleanser.cleanserBySpell();
+            
+
+            switch (COrbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo:
+                    Obj_AI_Hero tar2;
+                    if (isMenuEnabled("UseEC") && CondemnCheck(Player.ServerPosition, out tar2)) { CastE(tar2);}
+                    useIgnite();
+                    break;
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    Obj_AI_Hero tar3;
+                    if (isMenuEnabled("UseEH") && CondemnCheck(Player.ServerPosition, out tar3)) { CastE(tar3); }
+                    break;
+            }  
+
+            
+        }
 
         #region Miscellaneous
 
-        private static void ENextAuto(Obj_AI_Hero tar)
+        private void ENextAuto(Obj_AI_Hero tar)
         {
-            if (!E.IsReady() || !tar.IsValid || !Menu.Item("ENext").GetValue<KeyBind>().Active)
-            {
-                return;
-            }
-
+            if (!E.IsReady() || !tar.IsValid || !Menu.Item("ENext").GetValue<KeyBind>().Active) return;
             CastE(tar, true);
-            Menu.Item("ENext").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle));
+            Menu.Item("ENext").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle, false));
         }
 
-        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            var gpSender = gapcloser.Sender;
-            if (!IsMenuEnabled("AntiGP") || !E.IsReady() || !gpSender.IsValidTarget())
-            {
-                return;
-            }
+            var GPSender = (Obj_AI_Hero)gapcloser.Sender;
+            if (!isMenuEnabled("AntiGP") || !E.IsReady() || !GPSender.IsValidTarget()) return;
+            CastE(GPSender, true);
 
-            CastE(gpSender, true);
         }
 
-        private static void Interrupter_OnPossibleToInterrupt(AttackableUnit unit, InterruptableSpell spell)
+        void Interrupter_OnPossibleToInterrupt(AttackableUnit unit, InterruptableSpell spell)
         {
-            var sender = (Obj_AI_Hero) unit;
-            if (!IsMenuEnabled("Interrupt") || !E.IsReady() || !sender.IsValidTarget())
-            {
-                return;
-            }
-
-            CastE(sender, true);
+            var Sender = (Obj_AI_Hero)unit;
+            if (!isMenuEnabled("Interrupt") || !E.IsReady() || !Sender.IsValidTarget()) return;
+            CastE(Sender,true);
         }
 
-        private static bool CondemnCheck(Vector3 position, out Obj_AI_Hero target)
+        bool CondemnCheck(Vector3 Position, out Obj_AI_Hero target)
         {
-            if (IsUnderEnTurret(Player.Position) && IsMenuEnabled("NoEEnT"))
+            if (isUnderEnTurret(Player.Position) && isMenuEnabled("NoEEnT"))
             {
                 target = null;
                 return false;
             }
-
-            foreach (var en in
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(
-                        hero =>
-                            hero.IsEnemy && hero.IsValidTarget() && !IsMenuEnabled("nC" + hero.ChampionName) &&
-                            hero.Distance(position) <= E.Range))
+            foreach (var En in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget() && !isMenuEnabled("nC"+hero.ChampionName) && hero.Distance(Position)<=E.Range))
             {
-                var ePred = E.GetPrediction(en);
-                var pushDist = Menu.Item("PushDistance").GetValue<Slider>().Value;
-                var finalPosition = ePred.UnitPosition.To2D().Extend(position.To2D(), -pushDist).To3D();
-                for (var i = 1; i < pushDist; i += (int) en.BoundingRadius)
+                var EPred = E.GetPrediction(En);
+                int pushDist = Menu.Item("PushDistance").GetValue<Slider>().Value;
+                var FinalPosition = EPred.UnitPosition.To2D().Extend(Position.To2D(), -pushDist).To3D();
+                for (int i = 1; i < pushDist; i += (int)En.BoundingRadius)
                 {
-                    var loc3 = ePred.UnitPosition.To2D().Extend(position.To2D(), -i).To3D();
-                    var orTurret = IsMenuEnabled("CondemnTurret") && IsUnderTurret(finalPosition);
-                    var orFlag = IsMenuEnabled("CondemnFlag") && IsJ4FlagThere(loc3, en);
-                    var orFountain = IsMenuEnabled("CondemnTurret") && IsFountain(finalPosition);
+                    Vector3 loc3 = EPred.UnitPosition.To2D().Extend(Position.To2D(), -i).To3D();
+                    var OrTurret = isMenuEnabled("CondemnTurret") && isUnderTurret(FinalPosition);
+                    var OrFlag = isMenuEnabled("CondemnFlag") && isJ4FlagThere(loc3, En);
+                    var OrFountain = isMenuEnabled("CondemnTurret") && isFountain(FinalPosition);
                     AfterCond = loc3;
-                    if (!IsWall(loc3) && !orTurret && !orFlag && !orFountain)
+                    if (isWall(loc3) || OrTurret || OrFlag || OrFountain)
                     {
-                        continue;
+                        if(isMenuEnabled("BushRevealer"))CheckAndWard(Position,loc3,En);
+                        target = En;
+                        return true; 
                     }
-
-                    if (IsMenuEnabled("BushRevealer"))
-                    {
-                        CheckAndWard(position, loc3, en);
-                    }
-
-                    target = en;
-                    return true;
                 }
             }
-
             target = null;
             return false;
+            
         }
 
-        private static void QFarmCheck()
+        void QFarmCheck()
         {
-            if (!Q.IsReady())
-            {
-                return;
-            }
-
-            var posAfterQ = Player.Position.To2D().Extend(Game.CursorPos.To2D(), 300);
+            if (!Q.IsReady()) return;
+            var PosAfterQ = Player.Position.To2D().Extend(Game.CursorPos.To2D(), 300);
             var minList =
-                MinionManager.GetMinions(Player.Position, 550f)
-                    .Where(
-                        min =>
-                            HealthPrediction.GetHealthPrediction(
-                                min,
-                                (int) (Q.Delay + min.Distance(posAfterQ) / Orbwalking.GetMyProjectileSpeed()) * 1000) +
-                            (Game.Ping / 2) <= (Q.GetDamage(min) + Player.GetAutoAttackDamage(min)) &&
-                            HealthPrediction.GetHealthPrediction(
-                                min,
-                                (int) (Q.Delay + min.Distance(posAfterQ) / Orbwalking.GetMyProjectileSpeed()) * 1000) +
-                            (Game.Ping / 2) > Player.GetAutoAttackDamage(min)); //Player.GetAutoAttackDamage(min)
-
-            var objAiBases = minList as Obj_AI_Base[] ?? minList.ToArray();
-            if (!objAiBases.Any())
-            {
-                return;
-            }
-
-            CastQ(Vector3.Zero, objAiBases.First());
+                MinionManager.GetMinions(Player.Position, 550f).Where(min =>
+                    HealthPrediction.GetHealthPrediction(min,(int)(Q.Delay + min.Distance(PosAfterQ) / Orbwalking.GetMyProjectileSpeed()) * 1000)+(Game.Ping/2) <= (Q.GetDamage(min)+Player.GetAutoAttackDamage(min))
+                    && HealthPrediction.GetHealthPrediction(min, (int)(Q.Delay + min.Distance(PosAfterQ) / Orbwalking.GetMyProjectileSpeed()) * 1000) + (Game.Ping / 2) > Player.GetAutoAttackDamage(min)); //Player.GetAutoAttackDamage(min)
+           
+            if (!minList.Any()) return;
+            CastQ(Vector3.Zero,minList.First());
         }
 
-
-        private static void NoAaStealth()
+        
+        void NoAAStealth()
         {
-            var mb = (!IsMenuEnabled("NoAAStealth") || !Player.HasBuff("vaynetumblefade", true));
+            var mb = (isMenuEnabled("NoAAStealth") && Player.HasBuff("vaynetumblefade", true))?false:true;
             COrbwalker.SetAttack(mb);
         }
 
-        private static void FocusTarget()
+        void FocusTarget()
         {
-            if (!IsMenuEnabled("SpecialFocus"))
+            if (!isMenuEnabled("SpecialFocus")) return;
+            foreach (
+                var hero in
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(null))))
             {
-                return;
-            }
-
-            foreach (var hero in
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(null)))
-                    .Where(Has2WStacks))
-            {
-                COrbwalker.ForceTarget(hero);
-                Hud.SelectedUnit = hero;
-                return;
-            }
-        }
+                if (has2WStacks(hero))
+                {
+                    COrbwalker.ForceTarget(hero);
+                    Hud.SelectedUnit = hero;
+                    return;
+                }       
+             }
+         }
+            
+        
 
 
-        private static IEnumerable<int> GetSequence(String order)
+        int[] getSequence(String Order)
         {
-            switch (order)
+            switch (Order)
             {
                 case "QWE":
-                    return Qwe;
+                    return QWE;
                 case "QEW":
-                    return Qew;
+                    return QEW;
                 case "WQE":
-                    return Wqe;
+                    return WQE;
                 case "EQW":
-                    return Eqw;
+                    return EQW;
                 case "WEQ":
-                    return Weq;
+                    return WEQ;
                 case "EWQ":
-                    return Ewq;
+                    return EWQ;
                 default:
                     return null;
             }
@@ -513,62 +415,46 @@ namespace VayneHunterRework
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
-                Menu.SubMenu("NoCondemn")
-                    .AddItem(new MenuItem("nC" + hero.ChampionName, hero.ChampionName).SetValue(false));
+                Menu.SubMenu("NoCondemn").AddItem(new MenuItem("nC" + hero.ChampionName, hero.ChampionName).SetValue(false));
             }
         }
 
-        private static void CheckAndWard(Vector3 sPos, Vector3 endPosition, Obj_AI_Hero target)
+        void CheckAndWard(Vector3 sPos, Vector3 EndPosition, Obj_AI_Hero target)
         {
-            if (!IsGrass(endPosition))
+            if (isGrass(EndPosition))
             {
-                return;
-            }
-
-            var wardSlot = FindBestWardItem();
-            if (wardSlot == null)
-            {
-                return;
-            }
-
-            for (var i = 1; i < Vector3.Distance(sPos, endPosition); i += (int) target.BoundingRadius)
-            {
-                var v = sPos.To2D().Extend(endPosition.To2D(), i).To3D();
-                if (!IsGrass(v))
+                var WardSlot = FindBestWardItem();
+                if (WardSlot == null) return;
+                for (int i = 1; i < Vector3.Distance(sPos, EndPosition); i += (int)target.BoundingRadius)
                 {
-                    continue;
-                }
-
-                //WardSlot.UseItem(v);
-                Player.Spellbook.CastSpell(wardSlot.SpellSlot, v);
-                return;
-            }
-        }
-
-        private static void DrawPostCondemn()
-        {
-            var drawCond = Menu.Item("DrawCond").GetValue<Circle>();
-            foreach (var en in
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(
-                        hero =>
-                            hero.IsEnemy && hero.IsValidTarget() && !IsMenuEnabled("nC" + hero.ChampionName) &&
-                            hero.Distance(Player.Position) <= E.Range))
-            {
-                var ePred = E.GetPrediction(en);
-                var pushDist = Menu.Item("PushDistance").GetValue<Slider>().Value;
-                for (var i = 0; i < pushDist; i += (int) en.BoundingRadius)
-                {
-                    var loc3 = ePred.UnitPosition.To2D().Extend(Player.Position.To2D(), -i).To3D();
-                    if (IsWall(loc3))
+                    var v = sPos.To2D().Extend(EndPosition.To2D(), i).To3D();
+                    if (isGrass(v))
                     {
-                        Utility.DrawCircle(loc3, 100f, drawCond.Color);
+                        //WardSlot.UseItem(v);
+                        Player.Spellbook.CastSpell(WardSlot.SpellSlot, v);
+                        return;
                     }
                 }
             }
         }
 
-        private static void TakeLantern()
+        void DrawPostCondemn()
+        {
+            var DrawCond = Menu.Item("DrawCond").GetValue<Circle>();
+            foreach (var En in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget() && !isMenuEnabled("nC" + hero.ChampionName) && hero.Distance(Player.Position) <= E.Range))
+            {
+                var EPred = E.GetPrediction(En);
+                int pushDist = Menu.Item("PushDistance").GetValue<Slider>().Value;
+                for (int i = 0; i < pushDist; i += (int)En.BoundingRadius)
+                {
+                    Vector3 loc3 = EPred.UnitPosition.To2D().Extend(Player.Position.To2D(), -i).To3D();
+                    if (isWall(loc3)) Utility.DrawCircle(loc3, 100f, DrawCond.Color);
+
+                }
+            }
+        }
+
+        void takeLantern()
         {
             /**
             foreach (GameObject obj in ObjectManager.Get<GameObject>())
@@ -588,17 +474,15 @@ namespace VayneHunterRework
              * */
         }
 
-        private static void WallTumble()
+        void WallTumble()
         {
-            if (!IsSummonersRift())
+            if (!isSummonersRift()) return;
+            Vector2 MidWallQPos = new Vector2(6707.485f, 8802.744f);
+            Vector2 DrakeWallQPos = new Vector2(11514, 4462);
+            if (Player.Distance(MidWallQPos) >= Player.Distance(DrakeWallQPos))
             {
-                return;
-            }
 
-            var midWallQPos = new Vector2(6707.485f, 8802.744f);
-            var drakeWallQPos = new Vector2(11514, 4462);
-            if (Player.Distance(midWallQPos) >= Player.Distance(drakeWallQPos))
-            {
+
                 if (Player.Position.X < 12000 || Player.Position.X > 12070 || Player.Position.Y < 4800 ||
                     Player.Position.Y > 4872)
                 {
@@ -607,7 +491,7 @@ namespace VayneHunterRework
                 else
                 {
                     MoveToLimited(new Vector2(12050, 4827).To3D());
-                    Q.Cast(drakeWallQPos, true);
+                    Q.Cast(DrakeWallQPos, true);
                 }
             }
             else
@@ -620,201 +504,128 @@ namespace VayneHunterRework
                 else
                 {
                     MoveToLimited(new Vector2(6958, 8944).To3D());
-                    Q.Cast(midWallQPos, true);
+                    Q.Cast(MidWallQPos, true);
                 }
             }
         }
 
-        private static void MoveToLimited(Vector3 where)
+        void MoveToLimited(Vector3 where)
         {
-            if (Environment.TickCount - _lastMoveC < 80)
+            if (Environment.TickCount - LastMoveC < 80)
             {
                 return;
             }
-
-            _lastMoveC = Environment.TickCount;
+            LastMoveC = Environment.TickCount;
             Player.IssueOrder(GameObjectOrder.MoveTo, where);
         }
 
         #endregion
 
         #region Q Region
-
-        private void SmartQCheck(Obj_AI_Hero target)
+        void SmartQCheck(Obj_AI_Hero target)
         {
-            if (!Q.IsReady() || !target.IsValidTarget())
+            if (!Q.IsReady() || !target.IsValidTarget()) return;
+            if (!isMenuEnabled("SmartQ") || !E.IsReady())
             {
-                return;
-            }
-
-            if (!IsMenuEnabled("SmartQ") || !E.IsReady())
-            {
-                CastQ(Game.CursorPos, target);
+                CastQ(Game.CursorPos,target);
             }
             else
             {
-                for (var I = 0; I <= 360; I += 65)
+                for (int I = 0; I <= 360; I += 65)
                 {
-                    var f1 =
-                        new Vector2(
-                            Player.Position.X + (float) (300 * Math.Cos(I * (Math.PI / 180))),
-                            Player.Position.Y + (float) (300 * Math.Sin(I * (Math.PI / 180)))).To3D();
-                    // var FinalPos = Player.Position.To2D().Extend(F1, 300).To3D();
+                    var F1 = new Vector2(Player.Position.X + (float)(300 * Math.Cos(I * (Math.PI / 180))), Player.Position.Y + (float)(300 * Math.Sin(I * (Math.PI / 180)))).To3D();
+                   // var FinalPos = Player.Position.To2D().Extend(F1, 300).To3D();
                     Obj_AI_Hero targ;
-                    if (!CondemnCheck(f1, out targ))
+                    if (CondemnCheck(F1, out targ))
                     {
-                        continue;
+                        CastTumble(F1,target);
+                        CastE(target);
+                        return;
                     }
-
-                    CastTumble(f1, target);
-                    CastE(target);
-                    return;
                 }
-
                 CastQ(Game.CursorPos, target);
             }
         }
 
-        private static void CastQ(Vector3 pos, Obj_AI_Base target, bool customPos = false)
+        void CastQ(Vector3 Pos,Obj_AI_Base target,bool customPos=false)
         {
-            if (!Q.IsReady() || !target.IsValidTarget())
-            {
-                return;
-            }
-
+           if (!Q.IsReady() || !target.IsValidTarget()) return;
+           
             switch (COrbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
-                    var manaC = Menu.Item("QManaC").GetValue<Slider>().Value;
-                    var enMin = Menu.Item("NEnUlt").GetValue<Slider>().Value;
-                    var enemiesList =
+                    var ManaC = Menu.Item("QManaC").GetValue<Slider>().Value;
+                    var EnMin = Menu.Item("NEnUlt").GetValue<Slider>().Value;
+                    var EnemiesList =
                         ObjectManager.Get<Obj_AI_Hero>()
-                            .Where(h => h.IsValid && !h.IsDead && h.Distance(Player.Position) <= 900 && h.IsEnemy)
-                            .ToList();
-                    if (GetPerValue(true) >= manaC && IsMenuEnabled("UseQC"))
+                            .Where(h => h.IsValid && !h.IsDead && h.Distance(Player.Position) <= 900 && h.IsEnemy).ToList();
+                    if (getPerValue(true) >= ManaC && isMenuEnabled("UseQC"))
                     {
-                        if (IsMenuEnabled("UseRC") && R.IsReady() && enemiesList.Count >= enMin)
-                        {
-                            R.CastOnUnit(Player);
-                        }
-
-                        if (!customPos)
-                        {
-                            CastTumble(target);
-                        }
-
-                        else
-                        {
-                            CastTumble(pos, target);
-                        }
+                        if(isMenuEnabled("UseRC") && R.IsReady() && EnemiesList.Count >= EnMin)R.CastOnUnit(Player);
+                        if(!customPos){CastTumble(target);}else{CastTumble(Pos,target);}
                     }
                     break;
                 case Orbwalking.OrbwalkingMode.Mixed:
-                    var manaH = Menu.Item("QManaH").GetValue<Slider>().Value;
-                    if (GetPerValue(true) >= manaH && IsMenuEnabled("UseQH"))
-                    {
-                        if (!customPos)
-                        {
-                            CastTumble(target);
-                        }
-                        else
-                        {
-                            CastTumble(pos, target);
-                        }
-                    }
+                    var ManaH = Menu.Item("QManaH").GetValue<Slider>().Value;
+                    if (getPerValue(true) >= ManaH && isMenuEnabled("UseQH")){ if (!customPos){ CastTumble(target);} else{ CastTumble(Pos, target);}}
                     break;
                 case Orbwalking.OrbwalkingMode.LastHit:
-                    var manaLh = Menu.Item("QManaLH").GetValue<Slider>().Value;
-                    if (GetPerValue(true) >= manaLh && IsMenuEnabled("UseQLH"))
-                    {
-                        if (!customPos)
-                        {
-                            CastTumble(target);
-                        }
-                        else
-                        {
-                            CastTumble(pos, target);
-                        }
-                    }
+                    var ManaLH = Menu.Item("QManaLH").GetValue<Slider>().Value;
+                    if (getPerValue(true) >= ManaLH && isMenuEnabled("UseQLH")) { if (!customPos) { CastTumble(target); } else { CastTumble(Pos, target); } }
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
-                    var manaLc = Menu.Item("QManaLC").GetValue<Slider>().Value;
-                    if (GetPerValue(true) >= manaLc && IsMenuEnabled("UseQLC"))
-                    {
-                        if (!customPos)
-                        {
-                            CastTumble(target);
-                        }
-                        else
-                        {
-                            CastTumble(pos, target);
-                        }
-                    }
+                    var ManaLC = Menu.Item("QManaLC").GetValue<Slider>().Value;
+                    if (getPerValue(true) >= ManaLC && isMenuEnabled("UseQLC")){ if (!customPos){CastTumble(target); }else{ CastTumble(Pos, target);}}
+                    break;
+                default:
                     break;
             }
         }
-
-/*
-        private Vector3 GetQVectorMelee()
+        Vector3 getQVectorMelee()
         {
             if (isMenuEnabled("SmartQ") || !isMenuEnabled("SpecialQMelee"))
             {
                 return Player.Position.Extend(Game.CursorPos, Q.Range);
             }
 
-            var position = Game.CursorPos;
+            var Position = Game.CursorPos;
             //Standard Q end position
-            var extended = Player.Position.Extend(position, Q.Range);
-
+            var Extended = Player.Position.Extend(Position, Q.Range);
             //Check for Melee enemies in that range
-            var heroesThere =
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(h => h.Distance(extended) <= 375f && h.IsValidTarget() && h.IsMelee())
-                    .OrderBy(h => h.Distance(Player))
-                    .ToList();
-
+            var HeroesThere =
+                ObjectManager.Get<Obj_AI_Hero>().Where(h => h.Distance(Extended) <= 375f && h.IsValidTarget() && h.IsMelee()).OrderBy(h => h.Distance(Player)).ToList();
             //If the count is 0 return the normal position
-            if (heroesThere.Count == 0)
+            if (HeroesThere.Count == 0)
             {
-                return extended;
+                return Extended;
             }
-
             //Find the closest hero
-            var theHero = heroesThere.First();
-
+            var theHero = HeroesThere.First();
             //Extend the V3 of the hero radius to my player. Not used atm.
-            var heroRadius = theHero.Position.Extend(Player.Position, theHero.AttackRange);
-
+            var HeroRadius = theHero.Position.Extend(Player.Position, theHero.AttackRange);
             //Intersection.. Not used atm.
-            var intersection = theHero.Position.To2D()
-                .Intersection(heroRadius.To2D(), Player.Position.To2D(), extended.To2D());
-
+            var Intersection = Geometry.Intersection(theHero.Position.To2D(), HeroRadius.To2D(), Player.Position.To2D(), Extended.To2D());
             //Start angle
-            double angle = 0;
-
+            double Angle = 0;
             //Step angle
-            const int step = 10;
-
+            var step = 10;
             //The new extended variable
-            var newExtended = extended;
-
+            var newExtended = Extended;
             //While the heroes near the new position are > 0 or the angle <= 180
             while (
                 ObjectManager.Get<Obj_AI_Hero>()
                     .Where(h => h.Distance(newExtended) <= 375f && h.IsValidTarget() && h.IsMelee())
                     .ToList()
-                    .Count > 0 || angle <= 45)
+                    .Count > 0 || Angle <= 45)
             {
                 //Augment the angle by step
-                angle += step;
-
+                Angle += step;
                 //Second angle
-                var angle2 = -angle;
-
+                var Angle2 = -Angle;
                 //Find the new extended position
                 newExtended = new Vector3(
-                    extended.X * (float) Math.Cos(Geometry.DegreeToRadian(angle)),
-                    extended.Y * (float) Math.Sin(Geometry.DegreeToRadian(angle)), extended.Z);
+                    Extended.X * (float)Math.Cos(Geometry.DegreeToRadian(Angle)),
+                    Extended.Y * (float)Math.Sin(Geometry.DegreeToRadian(Angle)), Extended.Z);
 
                 //Move in one direction first. Then check:
                 //Are enemies still there?
@@ -827,196 +638,157 @@ namespace VayneHunterRework
                         .Count > 0)
                 {
                     newExtended = new Vector3(
-                        extended.X * (float) Math.Cos(Geometry.DegreeToRadian(angle2)),
-                        extended.Y * (float) Math.Sin(Geometry.DegreeToRadian(angle2)), extended.Z);
+                    Extended.X * (float)Math.Cos(Geometry.DegreeToRadian(Angle2)),
+                    Extended.Y * (float)Math.Sin(Geometry.DegreeToRadian(Angle2)), Extended.Z);
                 }
             }
-
             //return the end position
             return newExtended;
         }
-*/
 
-        private static void CastTumble(Obj_AI_Base target)
+        void CastTumble(Obj_AI_Base target)
         {
-            var posAfterTumble = ObjectManager.Player.ServerPosition.To2D().Extend(Game.CursorPos.To2D(), 300).To3D();
+            var posAfterTumble =
+                ObjectManager.Player.ServerPosition.To2D().Extend(Game.CursorPos.To2D(), 300).To3D();
             var distanceAfterTumble = Vector3.DistanceSquared(posAfterTumble, target.ServerPosition);
-            if (!(distanceAfterTumble < 550 * 550) || !(distanceAfterTumble > 100 * 100))
+            if (distanceAfterTumble < 550*550 && distanceAfterTumble > 100*100)
             {
-                return;
+                if (getEnemiesInRange(posAfterTumble, 500f) >= 3 && getAlliesInRange(posAfterTumble, 410f) < 3 && isMenuEnabled("NoQEn")) return;
+                Q.Cast(Game.CursorPos, isMenuEnabled("Packets"));
             }
-
-            if (GetEnemiesInRange(posAfterTumble, 500f) >= 3 && GetAlliesInRange(posAfterTumble, 410f) < 3 &&
-                IsMenuEnabled("NoQEn"))
-            {
-                return;
-            }
-
-            Q.Cast(Game.CursorPos, IsMenuEnabled("Packets"));
         }
-
-        private static void CastTumble(Vector3 pos, Obj_AI_Base target)
+        void CastTumble(Vector3 Pos,Obj_AI_Base target)
         {
-            var posAfterTumble = ObjectManager.Player.ServerPosition.To2D().Extend(pos.To2D(), 300).To3D();
+            var posAfterTumble =
+                ObjectManager.Player.ServerPosition.To2D().Extend(Pos.To2D(), 300).To3D();
             var distanceAfterTumble = Vector3.DistanceSquared(posAfterTumble, target.ServerPosition);
-            if (!(distanceAfterTumble < 550 * 550) || !(distanceAfterTumble > 100 * 100))
+            if (distanceAfterTumble < 550*550 && distanceAfterTumble > 100*100)
             {
-                return;
+                if (getEnemiesInRange(posAfterTumble, 500f) >= 3 && getAlliesInRange(posAfterTumble, 410f) < 3 && isMenuEnabled("NoQEn")) return;
+                Q.Cast(Pos, isMenuEnabled("Packets"));
             }
-
-            if (GetEnemiesInRange(posAfterTumble, 500f) >= 3 && GetAlliesInRange(posAfterTumble, 410f) < 3 &&
-                IsMenuEnabled("NoQEn"))
-            {
-                return;
-            }
-
-            Q.Cast(pos, IsMenuEnabled("Packets"));
         }
-
         #endregion
 
         #region E Region
-
-        private static void CastE(Obj_AI_Hero target, bool isForGapcloser = false)
+        void CastE(Obj_AI_Hero target, bool isForGapcloser = false)
         {
-            if (!E.IsReady() || !target.IsValidTarget())
-            {
-                return;
-            }
-
+            if (!E.IsReady() || !target.IsValidTarget()) return;
             if (isForGapcloser)
             {
-                E.Cast(target, IsMenuEnabled("Packets"));
+                E.Cast(target, isMenuEnabled("Packets"));
                 AfterCond = Vector3.Zero;
                 return;
             }
-
             switch (COrbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
-                    var manaC = Menu.Item("EManaC").GetValue<Slider>().Value;
-                    if (IsMenuEnabled("UseEC") && GetPerValue(true) >= manaC)
+                    var ManaC = Menu.Item("EManaC").GetValue<Slider>().Value;
+                    if (isMenuEnabled("UseEC") && getPerValue(true) >= ManaC)
                     {
-                        E.Cast(target, IsMenuEnabled("Packets"));
+                        E.Cast(target, isMenuEnabled("Packets"));
                         AfterCond = Vector3.Zero;
                     }
                     break;
                 case Orbwalking.OrbwalkingMode.Mixed:
-                    var manaH = Menu.Item("EManaH").GetValue<Slider>().Value;
-                    if (IsMenuEnabled("UseEH") && GetPerValue(true) >= manaH)
+                    var ManaH = Menu.Item("EManaH").GetValue<Slider>().Value;
+                    if (isMenuEnabled("UseEH") && getPerValue(true) >= ManaH)
                     {
-                        E.Cast(target, IsMenuEnabled("Packets"));
+                        E.Cast(target, isMenuEnabled("Packets"));
                         AfterCond = Vector3.Zero;
                     }
+                    break;
+                default:
                     break;
             }
         }
 
-        private static void EKs()
+        void EKs()
         {
-            if (Q.IsReady() || Player.CanAttack || !IsMenuEnabled("AutoEKS"))
-            {
+            if (Q.IsReady() || Player.CanAttack || !isMenuEnabled("AutoEKS"))
                 return;
-            }
-
             foreach (
                 var hero in
-                    ObjectManager.Get<Obj_AI_Hero>()
-                        .Where(h => h.Distance(Player) > E.Range - 120 && h.IsValidTarget())
-                        .Where(Has2WStacks)
-                        .Where(
-                            hero =>
-                                Player.GetSpellDamage(hero, SpellSlot.W) + Player.GetSpellDamage(hero, SpellSlot.E) >=
-                                HealthPrediction.GetHealthPrediction(
-                                    hero, (int) (Player.Distance(hero) / E.Speed) * 1000)))
+                    ObjectManager.Get<Obj_AI_Hero>().Where(h => h.Distance(Player) > E.Range - 120 && h.IsValidTarget())
+                )
             {
-                E.Cast(hero, IsMenuEnabled("Packets"));
-                return;
+                if (has2WStacks(hero))
+                {
+                    if (Player.GetSpellDamage(hero, SpellSlot.W) + Player.GetSpellDamage(hero, SpellSlot.E) >=
+                        HealthPrediction.GetHealthPrediction(hero, (int) (Player.Distance(hero) / E.Speed) * 1000))
+                    {
+                        E.Cast(hero, isMenuEnabled("Packets"));
+                        return;
+                    }
+                }
             }
         }
-
         #endregion
-
+        
         #region Items
-
-        private static void UseItems(Obj_AI_Hero tar)
+        void UseItems(Obj_AI_Hero tar)
         {
-            var ownH = GetPerValue(false);
-            if ((Menu.Item("BotrkC").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) &&
-                (Menu.Item("OwnHPercBotrk").GetValue<Slider>().Value <= ownH) &&
-                ((Menu.Item("EnHPercBotrk").GetValue<Slider>().Value <= GetPerValueTarget(tar, false))))
+            var ownH = getPerValue(false);
+            if ((Menu.Item("BotrkC").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) && (Menu.Item("OwnHPercBotrk").GetValue<Slider>().Value <= ownH) &&
+                ((Menu.Item("EnHPercBotrk").GetValue<Slider>().Value <= getPerValueTarget(tar,false))))
             {
                 UseItem(3153, tar);
             }
-
-            if ((Menu.Item("BotrkH").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) &&
-                (Menu.Item("OwnHPercBotrk").GetValue<Slider>().Value <= ownH) &&
-                ((Menu.Item("EnHPercBotrk").GetValue<Slider>().Value <= GetPerValueTarget(tar, false))))
+            if ((Menu.Item("BotrkH").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && (Menu.Item("OwnHPercBotrk").GetValue<Slider>().Value <= ownH) &&
+               ((Menu.Item("EnHPercBotrk").GetValue<Slider>().Value <= getPerValueTarget(tar, false))))
             {
                 UseItem(3153, tar);
             }
-
             if (Menu.Item("YoumuuC").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
             {
                 UseItem(3142);
             }
-
             if (Menu.Item("YoumuuH").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
             {
                 UseItem(3142);
             }
-
             if (Menu.Item("BilgeC").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
             {
-                UseItem(3144, tar);
+                UseItem(3144,tar);
             }
-
             if (Menu.Item("BilgeH").GetValue<bool>() && COrbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
             {
                 UseItem(3144, tar);
             }
         }
 
-        private static void UseIgnite()
+        void useIgnite()
         {
             //Ignite
             var dmg = 50 + 20 * Player.Level;
             var tg = TargetSelector.GetSelectedTarget();
             var ign = Player.GetSpellSlot("summonerdot");
-            if (!IsMenuEnabled("UseIgn") || !tg.IsValidTarget() || !(dmg > tg.Health))
+            if (isMenuEnabled("UseIgn") && tg.IsValidTarget() && dmg > tg.Health)
             {
-                return;
-            }
-
-            if (ign != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(ign) == SpellState.Ready)
-            {
-                Player.Spellbook.CastSpell(ign, tg);
+                if (ign != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(ign) == SpellState.Ready)
+                {
+                    Player.Spellbook.CastSpell(ign, tg);
+                }
             }
         }
 
-        private static void AutoPot()
+        private void AutoPot()
         {
             if (ObjectManager.Player.HasBuff("Recall") || Player.InFountain() && Player.InShop())
-            {
                 return;
-            }
 
             //Health Pots
-            if (IsMenuEnabled("APH") && GetPerValue(false) <= Menu.Item("APH_Slider").GetValue<Slider>().Value &&
-                !Player.HasBuff("RegenerationPotion", true))
+            if (isMenuEnabled("APH") && getPerValue(false) <= Menu.Item("APH_Slider").GetValue<Slider>().Value && !Player.HasBuff("RegenerationPotion", true))
             {
                 UseItem(2003);
             }
-
             //Mana Pots
-            if (IsMenuEnabled("APM") && GetPerValue(true) <= Menu.Item("APM_Slider").GetValue<Slider>().Value &&
-                !Player.HasBuff("FlaskOfCrystalWater", true))
+            if (isMenuEnabled("APM") && getPerValue(true) <= Menu.Item("APM_Slider").GetValue<Slider>().Value && !Player.HasBuff("FlaskOfCrystalWater", true))
             {
                 UseItem(2004);
             }
-
             //Summoner Heal
-            if (IsMenuEnabled("APHeal") && GetPerValue(false) <= Menu.Item("APHeal_Slider").GetValue<Slider>().Value)
+            if (isMenuEnabled("APHeal") && getPerValue(false) <= Menu.Item("APHeal_Slider").GetValue<Slider>().Value)
             {
                 var heal = Player.GetSpellSlot("summonerheal");
                 if (heal != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(heal) == SpellState.Ready)
@@ -1026,59 +798,48 @@ namespace VayneHunterRework
             }
         }
 
+
+
+
         #endregion
 
         #region Utility Methods
 
-        private static bool IsSummonersRift()
+        bool isSummonersRift()
         {
-            return true;
+          return true;
         }
 
-        private static bool Has2WStacks(Obj_AI_Hero target)
+        bool has2WStacks(Obj_AI_Hero target)
         {
             return target.Buffs.Any(bu => bu.Name == "vaynesilvereddebuff" && bu.Count == 2);
         }
-
-        private static int GetEnemiesInRange(Vector3 point, float range)
+        int getEnemiesInRange(Vector3 point, float range)
         {
             return
                 ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(h => h.IsEnemy && !h.IsDead && h.IsValid && h.Distance(point) <= range)
-                    .ToList()
-                    .Count;
+                    .Where(h => h.IsEnemy && !h.IsDead && h.IsValid && h.Distance(point) <= range).ToList().Count;
         }
-
-        private static int GetAlliesInRange(Vector3 point, float range)
+        int getAlliesInRange(Vector3 point, float range)
         {
             return
                 ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(h => h.IsAlly && !h.IsDead && h.IsValid && h.Distance(point) <= range)
-                    .ToList()
-                    .Count;
+                    .Where(h => h.IsAlly && !h.IsDead && h.IsValid && h.Distance(point) <= range).ToList().Count;
         }
 
         private static SpellDataInst GetItemSpell(InventorySlot invSlot)
         {
-            return ObjectManager.Player.Spellbook.Spells.FirstOrDefault(spell => (int) spell.Slot == invSlot.Slot + 4);
+            return ObjectManager.Player.Spellbook.Spells.FirstOrDefault(spell => (int)spell.Slot == invSlot.Slot + 4);
         }
 
         private static InventorySlot FindBestWardItem()
         {
-            var slot = Items.GetWardSlot();
-            if (slot == default(InventorySlot))
-            {
-                return null;
-            }
-
-            var sdi = GetItemSpell(slot);
-            if (sdi != default(SpellDataInst) && sdi.State == SpellState.Ready)
-            {
-                return slot;
-            }
+            InventorySlot slot = Items.GetWardSlot();
+            if (slot == default(InventorySlot)) return null;
+            SpellDataInst sdi = GetItemSpell(slot);
+            if (sdi != default(SpellDataInst) && sdi.State == SpellState.Ready)return slot;
             return null;
         }
-
         public static void UseItem(int id, Obj_AI_Hero target = null)
         {
             if (Items.HasItem(id) && Items.CanUseItem(id))
@@ -1086,66 +847,53 @@ namespace VayneHunterRework
                 Items.UseItem(id, target);
             }
         }
-
-        private static bool IsWall(Vector3 pos)
+        bool isWall(Vector3 Pos)
         {
-            var cFlags = NavMesh.GetCollisionFlags(pos);
+            CollisionFlags cFlags = NavMesh.GetCollisionFlags(Pos);
             return (cFlags == CollisionFlags.Wall);
         }
-
-        private static bool IsUnderTurret(Vector3 position)
+        bool isUnderTurret(Vector3 Position)
         {
-            return
-                ObjectManager.Get<Obj_AI_Turret>()
-                    .Where(turr => turr.IsAlly && (turr.Health != 0))
-                    .Any(tur => tur.Distance(position) <= 975f);
+            foreach (var tur in ObjectManager.Get<Obj_AI_Turret>().Where(turr => turr.IsAlly && (turr.Health != 0)))
+            {
+                if (tur.Distance(Position) <= 975f) return true;
+            }
+            return false;
         }
-
-        private static bool IsUnderEnTurret(Vector3 position)
+        bool isUnderEnTurret(Vector3 Position)
         {
-            return
-                ObjectManager.Get<Obj_AI_Turret>()
-                    .Where(turr => turr.IsEnemy && (turr.Health != 0))
-                    .Any(tur => tur.Distance(position) <= 975f);
+            foreach (var tur in ObjectManager.Get<Obj_AI_Turret>().Where(turr => turr.IsEnemy && (turr.Health != 0)))
+            {
+                if (tur.Distance(Position) <= 975f) return true;
+            }
+            return false;
         }
-
-        public static bool IsMenuEnabled(String val)
+        public static bool isMenuEnabled(String val)
         {
             return Menu.Item(val).GetValue<bool>();
         }
-
-        private static float GetPerValue(bool mana)
+        float getPerValue(bool mana)
         {
-            if (mana)
-            {
-                return (Player.Mana / Player.MaxMana) * 100;
-            }
+            if (mana) return (Player.Mana / Player.MaxMana) * 100;
             return (Player.Health / Player.MaxHealth) * 100;
         }
-
-        private static float GetPerValueTarget(Obj_AI_Hero target, bool mana)
+        float getPerValueTarget(Obj_AI_Hero target, bool mana)
         {
-            if (mana)
-            {
-                return (target.Mana / target.MaxMana) * 100;
-            }
+            if (mana) return (target.Mana / target.MaxMana) * 100;
             return (target.Health / target.MaxHealth) * 100;
         }
-
-        private static bool IsGrass(Vector3 pos)
+        bool isGrass(Vector3 Pos)
         {
-            return NavMesh.IsWallOfGrass(pos, 65);
+            return NavMesh.IsWallOfGrass(Pos,65);
             //return false; 
         }
 
-        private static bool IsJ4FlagThere(Vector3 position, Obj_AI_Hero target)
+        bool isJ4FlagThere(Vector3 Position,Obj_AI_Hero target)
         {
-            return
-                ObjectManager.Get<Obj_AI_Base>()
-                    .Any(m => m.Distance(position) <= target.BoundingRadius && m.Name == "Beacon");
+            return ObjectManager.Get<Obj_AI_Base>().Any(m => m.Distance(Position) <= target.BoundingRadius && m.Name == "Beacon");
         }
 
-        private static bool IsFountain(Vector3 position)
+        bool isFountain(Vector3 Position)
         {
             float fountainRange = 750;
             var map = Utility.Map.GetMap();
@@ -1153,13 +901,16 @@ namespace VayneHunterRework
             {
                 fountainRange = 1050;
             }
-
             return
                 ObjectManager.Get<GameObject>()
                     .Where(spawnPoint => spawnPoint is Obj_SpawnPoint && spawnPoint.IsAlly)
-                    .Any(spawnPoint => Vector2.Distance(position.To2D(), spawnPoint.Position.To2D()) < fountainRange);
+                    .Any(
+                        spawnPoint =>
+                            Vector2.Distance(Position.To2D(), spawnPoint.Position.To2D()) <
+                            fountainRange);
         }
 
         #endregion
+
     }
 }

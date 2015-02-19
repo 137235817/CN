@@ -24,7 +24,7 @@ namespace Marksman
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Config = new Menu("ADCºÏ¼¯", "Marksman", true);
+            Config = new Menu("ADCåˆé›†", "Marksman", true);
             CClass = new Champion();
             AActivator = new Activator();
             
@@ -104,44 +104,44 @@ namespace Marksman
             CClass.Id = ObjectManager.Player.BaseSkinName;
             CClass.Config = Config;
 
-            var targetSelectorMenu = new Menu("Ä¿±êÑ¡Ôñ", "Target Selector");
+            var targetSelectorMenu = new Menu("ç›®æ ‡é€‰æ‹©", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
 
-            var orbwalking = Config.AddSubMenu(new Menu("×ß¿³", "Orbwalking"));
+            var orbwalking = Config.AddSubMenu(new Menu("èµ°ç ", "Orbwalking"));
             CClass.Orbwalker = new Orbwalking.Orbwalker(orbwalking);
 
             /* Menu Summoners */
-            var summoners = Config.AddSubMenu(new Menu("ÕÙ»½Ê¦¼¼ÄÜ", "Summoners"));
-            var summonersHeal = summoners.AddSubMenu(new Menu("ÖÎÁÆ", "Heal"));
+            var summoners = Config.AddSubMenu(new Menu("å¬å”¤å¸ˆæŠ€èƒ½", "Summoners"));
+            var summonersHeal = summoners.AddSubMenu(new Menu("æ²»ç–—", "Heal"));
             {
-                summonersHeal.AddItem(new MenuItem("SUMHEALENABLE", "ÆôÓÃ").SetValue(true));
-                summonersHeal.AddItem(new MenuItem("SUMHEALSLIDER", "ÉúÃüÖµ<= %Ê±Ê¹ÓÃÖÎÁÆ.").SetValue(new Slider(20, 99, 1)));
+                summonersHeal.AddItem(new MenuItem("SUMHEALENABLE", "å¯ç”¨").SetValue(true));
+                summonersHeal.AddItem(new MenuItem("SUMHEALSLIDER", "ç”Ÿå‘½å€¼<= %æ—¶ä½¿ç”¨æ²»ç–—.").SetValue(new Slider(20, 99, 1)));
             }
 
-            var summonersBarrier = summoners.AddSubMenu(new Menu("ÆÁÕÏ", "Barrier"));
+            var summonersBarrier = summoners.AddSubMenu(new Menu("å±éšœ", "Barrier"));
             {
-                summonersBarrier.AddItem(new MenuItem("SUMBARRIERENABLE", "ÆôÓÃ").SetValue(true));
+                summonersBarrier.AddItem(new MenuItem("SUMBARRIERENABLE", "å¯ç”¨").SetValue(true));
                 summonersBarrier.AddItem(
-                    new MenuItem("SUMBARRIERSLIDER", "ÉúÃüÖµ<= %Ê±Ê¹ÓÃÆÁÕÏ.").SetValue(new Slider(20, 99, 1)));
+                    new MenuItem("SUMBARRIERSLIDER", "ç”Ÿå‘½å€¼<= %æ—¶ä½¿ç”¨å±éšœ.").SetValue(new Slider(20, 99, 1)));
             }
 
-            var summonersIgnite = summoners.AddSubMenu(new Menu("ÒıÈ¼", "Ignite"));
+            var summonersIgnite = summoners.AddSubMenu(new Menu("å¼•ç‡ƒ", "Ignite"));
             {
-                summonersIgnite.AddItem(new MenuItem("SUMIGNITEENABLE", "ÆôÓÃ").SetValue(true));
+                summonersIgnite.AddItem(new MenuItem("SUMIGNITEENABLE", "å¯ç”¨").SetValue(true));
             }
             /* Menu Items */            
-            var items = Config.AddSubMenu(new Menu("ÎïÆ·", "Items"));
-            items.AddItem(new MenuItem("BOTRK", "ÆÆ°Ü").SetValue(true));
-            items.AddItem(new MenuItem("GHOSTBLADE", "ÓÄÃÎ").SetValue(true));
-            items.AddItem(new MenuItem("SWORD", "ÉñÊ¥Ö®½£").SetValue(true));
-            items.AddItem(new MenuItem("MURAMANA", "Ä§×Ú").SetValue(true));
-            QuickSilverMenu = new Menu("Ë®ÒøÊÎ´ø", "QuickSilverSash");
+            var items = Config.AddSubMenu(new Menu("ç‰©å“", "Items"));
+            items.AddItem(new MenuItem("BOTRK", "ç ´è´¥").SetValue(true));
+            items.AddItem(new MenuItem("GHOSTBLADE", "å¹½æ¢¦").SetValue(true));
+            items.AddItem(new MenuItem("SWORD", "ç¥åœ£ä¹‹å‰‘").SetValue(true));
+            items.AddItem(new MenuItem("MURAMANA", "é­”å®—").SetValue(true));
+            QuickSilverMenu = new Menu("æ°´é“¶é¥°å¸¦", "QuickSilverSash");
             items.AddSubMenu(QuickSilverMenu);
-            QuickSilverMenu.AddItem(new MenuItem("AnyStun", "Ñ£ÔÎ").SetValue(true));
-            QuickSilverMenu.AddItem(new MenuItem("AnySlow", "¼õËÙ").SetValue(true));
-            QuickSilverMenu.AddItem(new MenuItem("AnySnare", "Êø¸¿").SetValue(true));
-            QuickSilverMenu.AddItem(new MenuItem("AnyTaunt", "³°·í").SetValue(true));
+            QuickSilverMenu.AddItem(new MenuItem("AnyStun", "çœ©æ™•").SetValue(true));
+            QuickSilverMenu.AddItem(new MenuItem("AnySlow", "å‡é€Ÿ").SetValue(true));
+            QuickSilverMenu.AddItem(new MenuItem("AnySnare", "æŸç¼š").SetValue(true));
+            QuickSilverMenu.AddItem(new MenuItem("AnyTaunt", "å˜²è®½").SetValue(true));
             foreach (var t in AActivator.BuffList)
             {
                 foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -151,8 +151,8 @@ namespace Marksman
                 }
             }
             items.AddItem(
-                new MenuItem("UseItemsMode", "ÎïÆ·Ê¹ÓÃÄ£Ê½").SetValue(
-                    new StringList(new[] {"²»Ê¹ÓÃ", "»ìºÏÄ£Ê½", "Á¬ÕĞÄ£Ê½", "¶¼Ê¹ÓÃ"}, 2)));
+                new MenuItem("UseItemsMode", "ç‰©å“ä½¿ç”¨æ¨¡å¼").SetValue(
+                    new StringList(new[] {"ä¸ä½¿ç”¨", "æ··åˆæ¨¡å¼", "è¿æ‹›æ¨¡å¼", "éƒ½ä½¿ç”¨"}, 2)));
 
             
             //var Extras = Config.AddSubMenu(new Menu("Extras", "Extras"));
@@ -161,28 +161,29 @@ namespace Marksman
             // If Champion is supported draw the extra menus
             if (BaseType != CClass.GetType())
             {
-                var combo = new Menu("Á¬ÕĞ", "Combo");
+                var combo = new Menu("è¿æ‹›", "Combo");
                 if (CClass.ComboMenu(combo))
                 {
                     Config.AddSubMenu(combo);
                 }
 
-                var harass = new Menu("É§ÈÅ", "Harass");
+                var harass = new Menu("éªšæ‰°", "Harass");
                 if (CClass.HarassMenu(harass))
                 {
-                    harass.AddItem(new MenuItem("HarassMana", "É§ÈÅ·¨Á¦Öµ¿ØÖÆ").SetValue(new Slider(50, 100, 0)));
+                    harass.AddItem(new MenuItem("HarassMana", "éªšæ‰°æ³•åŠ›å€¼æ§åˆ¶").SetValue(new Slider(50, 100, 0)));
                     Config.AddSubMenu(harass);
                 }
 
-                var laneclear = new Menu("ÇåÏß", "LaneClear");
+                var laneclear = new Menu("æ¸…çº¿", "LaneClear");
                 if (CClass.LaneClearMenu(laneclear))
                 {
                     laneclear.AddItem(
-                        new MenuItem("LaneClearMana", "ÇåÏß·¨Á¦Öµ¿ØÖÆ").SetValue(new Slider(50, 100, 0)));
+                        new MenuItem("LaneClearMana", "æ¸…çº¿æ³•åŠ›å€¼æ§åˆ¶").SetValue(new Slider(50, 100, 0)));
                     Config.AddSubMenu(laneclear);
                 }
 
-                var misc = new Menu("ÆäËû", "Misc");
+                var misc = new Menu("å…¶ä»–", "Misc");
+                if (CClass.MiscMenu(misc))
                 if (CClass.MiscMenu(misc))
                 {
                     Config.AddSubMenu(misc);
@@ -204,23 +205,23 @@ namespace Marksman
                     Config.AddSubMenu(MenuInterruptableSpell);
                 }
                 */
-                var extras = new Menu("¶îÍâ", "Extras");
+                var extras = new Menu("é¢å¤–", "Extras");
                 if (CClass.ExtrasMenu(extras))
                 {
                     new PotionManager(extras);
                     Config.AddSubMenu(extras);
                 }
 
-                var drawing = new Menu("ÏÔÊ¾ÉèÖÃ", "Drawings");
+                var drawing = new Menu("æ˜¾ç¤ºè®¾ç½®", "Drawings");
                 if (CClass.DrawingMenu(drawing))
                 {
                     drawing.AddItem(
-                        new MenuItem("drawMinionLastHit", "¿É±»»÷É±Ğ¡±ø").SetValue(new Circle(false,
+                        new MenuItem("drawMinionLastHit", "å¯è¢«å‡»æ€å°å…µ").SetValue(new Circle(false,
                             System.Drawing.Color.GreenYellow)));
                     drawing.AddItem(
-                        new MenuItem("drawMinionNearKill", "¸½½ü»÷É±Ğ¡±ø").SetValue(new Circle(false,
+                        new MenuItem("drawMinionNearKill", "é™„è¿‘å‡»æ€å°å…µ").SetValue(new Circle(false,
                             System.Drawing.Color.Gray)));
-                    drawing.AddItem(new MenuItem("drawJunglePosition", "ÎŞÉË´òÒ°Î»ÖÃ").SetValue(true));
+                    drawing.AddItem(new MenuItem("drawJunglePosition", "æ— ä¼¤æ‰“é‡ä½ç½®").SetValue(true));
 
                     Config.AddSubMenu(drawing);
                 }

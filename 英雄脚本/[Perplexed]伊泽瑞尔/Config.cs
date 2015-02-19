@@ -14,6 +14,10 @@ namespace PerplexedEzreal
         public static Menu Settings = new Menu("[Perplexed]伊泽瑞尔", "menu", true);
         public static Orbwalking.Orbwalker Orbwalker;
 
+        public static string[] Marksmen = { "Kalista", "Jinx", "Lucian", "Quinn", "Draven",  "Varus", "Graves", "Vayne", "Caitlyn",
+                                                                    "Urgot", "Ezreal", "KogMaw", "Ashe", "MissFortune", "Tristana", "Teemo", "Sivir",
+                                                                    "Twitch", "Corki"};
+
         public static void Initialize()
         {
             //Orbwalker
@@ -31,14 +35,14 @@ namespace PerplexedEzreal
             Settings.SubMenu("menuHarass").AddItem(new MenuItem( "harassQ", "Q").SetValue(true));
             Settings.SubMenu("menuHarass").AddItem(new MenuItem("harassW", "W").SetValue(true));
             //Last Hit
-            Settings.AddSubMenu(new Menu("补刀", "menuLastHit"));
+            Settings.AddSubMenu(new Menu("补刀设置", "menuLastHit"));
             Settings.SubMenu("menuLastHit").AddItem(new MenuItem("lastHitQ", "Q").SetValue(true));
             //Auto
             Settings.AddSubMenu(new Menu("自动", "menuAuto"));
             Settings.SubMenu("menuAuto").AddItem(new MenuItem("toggleAuto", "锁定自动").SetValue(new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle, true)));
-            Settings.SubMenu("menuAuto").AddSubMenu(new Menu("英雄", "Champions"));
+            Settings.SubMenu("menuAuto").AddSubMenu(new Menu("英雄", "autoChamps"));
             foreach(Obj_AI_Hero hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValid && hero.IsEnemy))
-                Settings.SubMenu("menuAuto").SubMenu("自动攻击英雄").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(true));
+                Settings.SubMenu("menuAuto").SubMenu("autoChamps").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(Marksmen.Contains(hero.ChampionName)));
             Settings.SubMenu("menuAuto").AddItem(new MenuItem("autoQ", "Q").SetValue(true));
             Settings.SubMenu("menuAuto").AddItem(new MenuItem("autoW", "W").SetValue<bool>(false));
             Settings.SubMenu("menuAuto").AddItem(new MenuItem("manaER", "为 E/R留蓝").SetValue(true));
@@ -53,9 +57,9 @@ namespace PerplexedEzreal
             Settings.SubMenu("menuSumms").AddSubMenu(new Menu("治疗", "summHeal"));
             Settings.SubMenu("menuSumms").SubMenu("summHeal").AddItem(new MenuItem("useHeal", "启用").SetValue(true));
             Settings.SubMenu("menuSumms").SubMenu("summHeal").AddItem(new MenuItem("healPct", "血量低于%使用").SetValue(new Slider(35, 10, 90)));
-            Settings.SubMenu("menuSumms").AddSubMenu(new Menu("引燃", "summIgnite"));
+            Settings.SubMenu("menuSumms").AddSubMenu(new Menu("点燃", "summIgnite"));
             Settings.SubMenu("menuSumms").SubMenu("summIgnite").AddItem(new MenuItem("useIgnite", "启用").SetValue(true));
-            Settings.SubMenu("menuSumms").SubMenu("summIgnite").AddItem(new MenuItem("igniteMode", "使用引燃模式").SetValue(new StringList(new string[] { "执行", "连招" })));
+            Settings.SubMenu("menuSumms").SubMenu("summIgnite").AddItem(new MenuItem("igniteMode", "使用引燃").SetValue(new StringList(new string[] { "总是", "连招" })));
             //Items
             Settings.AddSubMenu(new Menu("物品", "menuItems"));
             Settings.SubMenu("menuItems").AddSubMenu(new Menu("进攻", "offItems"));
@@ -65,8 +69,8 @@ namespace PerplexedEzreal
             foreach (var defItem in ItemManager.Items.Where(item => item.Type == ItemType.Defensive))
             {
                 Settings.SubMenu("menuItems").SubMenu("defItems").AddSubMenu(new Menu(defItem.Name, "menu" + defItem.ShortName));
-                Settings.SubMenu("menuItems").SubMenu("defItems").SubMenu("menu" + defItem.ShortName).AddItem(new MenuItem("use" + defItem.ShortName, "启用").SetValue(true));
-                Settings.SubMenu("menuItems").SubMenu("defItems").SubMenu("menu" + defItem.ShortName).AddItem(new MenuItem("pctHealth" + defItem.ShortName, "血量低于%使用").SetValue(new Slider(35, 10, 90)));
+                Settings.SubMenu("menuItems").SubMenu("defItems").SubMenu("menu" + defItem.ShortName).AddItem(new MenuItem("use" + defItem.ShortName, "Enable").SetValue(true));
+                Settings.SubMenu("menuItems").SubMenu("defItems").SubMenu("menu" + defItem.ShortName).AddItem(new MenuItem("pctHealth" + defItem.ShortName, "Use On % Health").SetValue(new Slider(35, 10, 90)));
             }
             Settings.SubMenu("menuItems").AddSubMenu(new Menu("解控", "cleanseItems"));
             foreach (var cleanseItem in ItemManager.Items.Where(item => item.Type == ItemType.Cleanse))
@@ -86,7 +90,6 @@ namespace PerplexedEzreal
             Settings.AddItem(new MenuItem("dmgMode", "伤害模式").SetValue(new StringList(new string[] { "AD", "AP" })));
             Settings.AddItem(new MenuItem("recallBlock", "打断回城").SetValue(true));
             Settings.AddItem(new MenuItem("usePackets", "使用封包").SetValue(true));
-            //Finish
             Settings.AddToMainMenu();
         }
 
