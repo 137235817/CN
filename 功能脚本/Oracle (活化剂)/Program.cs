@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -57,7 +57,7 @@ namespace Oracle
       
             ChampionName = Me.ChampionName;
             Game.OnGameUpdate += Game_OnGameUpdate;
-            Game.PrintChat("<font color=\"#1FFF8F\">娲诲寲鍓倊" + Revision + " -</font> 鍔犺浇鎴愬姛<font color=\"#00BFFF\">Vee姹夊寲!</font>");
+            Game.PrintChat("<font color=\"#1FFF8F\">Oracle# r." + Revision + " -</font><font color=\"#FFFFCC\"> by Kurisu</font>");
 
             if (!Directory.Exists(Config.LeagueSharpDirectory + @"\Logs\Oracle"))
             {
@@ -92,7 +92,7 @@ namespace Oracle
                 Logger(LogType.Error, "Something went wrong with update checker!");
             }
 
-            Origin = new Menu("Oracle (活化剂)", "oracle", true);
+            Origin = new Menu("Oracle", "oracle", true);
             Cleansers.Initialize(Origin);
             Defensives.Initialize(Origin);
             Summoners.Initialize(Origin);
@@ -100,8 +100,8 @@ namespace Oracle
             Consumables.Initialize(Origin);
             AutoSpells.Initialize(Origin);
 
-            var config = new Menu("活化剂配置 "oracleconfig");
-            var dangerMenu = new Menu("危险设置-慎重",", "dangerconfig");
+            var config = new Menu("Oracle Config", "oracleconfig");
+            var dangerMenu = new Menu("Dangerous Config", "dangerconfig");
 
             foreach (var i in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.Team != Me.Team))
             {
@@ -120,34 +120,34 @@ namespace Oracle
             }
 
             config.AddItem(
-                new MenuItem("usecombo", "连招(开启)")
+                new MenuItem("usecombo", "Combo (Active)")
                     .SetValue(new KeyBind(32, KeyBindType.Press)));
 
             config.AddSubMenu(dangerMenu);
 
-            var cskills = new Menu("解控", "cskills");
+            var cskills = new Menu("Cleanse Special", "cskills");
             foreach (var debuff in GameBuff.CleanseBuffs)
                 cskills.AddItem(new MenuItem("cure" + debuff.BuffName, debuff.ChampionName + " | " + debuff.Slot))
                     .SetValue(true);
             config.AddSubMenu(cskills);
 
-            var cleanseMenu = new Menu("清除减益效果", "cdebufs");
-            cleanseMenu.AddItem(new MenuItem("stun", "眩晕")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("charm", "魅惑")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("taunt", "嘲讽")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("fear", "恐惧")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("snare", "陷阱")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("silence", "沉默")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("suppression", "虚弱")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("polymorph", "变形")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("blind", "致盲")).SetValue(false);
-            cleanseMenu.AddItem(new MenuItem("slow", "减速")).SetValue(false);
-            cleanseMenu.AddItem(new MenuItem("poison", "中毒")).SetValue(false);
+            var cleanseMenu = new Menu("Cleanse Debuffs", "cdebufs");
+            cleanseMenu.AddItem(new MenuItem("stun", "Stuns")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("charm", "Charms")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("taunt", "Taunts")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("fear", "Fears")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("snare", "Snares")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("silence", "Silences")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("suppression", "Supression")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("polymorph", "Polymorphs")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("blind", "Blinds")).SetValue(false);
+            cleanseMenu.AddItem(new MenuItem("slow", "Slows")).SetValue(false);
+            cleanseMenu.AddItem(new MenuItem("poison", "Poisons")).SetValue(false);
             config.AddSubMenu(cleanseMenu);
 
-            var debugMenu = new Menu("调试", "debugmenu");
-            debugMenu.AddItem(new MenuItem("dbool", "启用调试控制台")).SetValue(false);
-            debugMenu.AddItem(new MenuItem("catchobject", "载入物品名称"))
+            var debugMenu = new Menu("Debugging", "debugmenu");
+            debugMenu.AddItem(new MenuItem("dbool", "Enable Console Debugging")).SetValue(false);
+            debugMenu.AddItem(new MenuItem("catchobject", "Log object names"))
                 .SetValue(new KeyBind(89, KeyBindType.Press));
             config.AddSubMenu(debugMenu);
 
