@@ -64,34 +64,24 @@ namespace DZDraven_Reloaded
             Menu = menu;
 
             var menuDrawing = new Menu("显示设置", "orb_Draw");
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_AARange", "平A范围").SetValue(new Circle(true, Color.FloralWhite)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_AARange_Enemy", "敌人平A范围").SetValue(new Circle(true, Color.Pink)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_Holdzone", "待命区域").SetValue(new Circle(true, Color.FloralWhite)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_MinionHPBar", "小兵血条").SetValue(new Circle(true, Color.Black)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_MinionHPBar_thickness", "^ 血条厚度").SetValue(new Slider(1, 1, 3)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_hitbox", "显示按键").SetValue(new Circle(true, Color.FloralWhite)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_Lasthit", "小兵尾刀").SetValue(new Circle(true, Color.Lime)));
-            menuDrawing.AddItem(
-                new MenuItem("orb_Draw_nearKill", "将要击杀小兵").SetValue(new Circle(true, Color.Gold)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_AARange", "平A范围").SetValue(new Circle(true, Color.FloralWhite)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_AARange_Enemy", "敌人平A范围").SetValue(new Circle(true, Color.Pink)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_Holdzone", "待命区域").SetValue(new Circle(true, Color.FloralWhite)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_MinionHPBar", "小兵血条").SetValue(new Circle(true, Color.Black)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_MinionHPBar_thickness", "^ 血条厚度").SetValue(new Slider(1, 1, 3)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_hitbox", "显示按键").SetValue(new Circle(true, Color.FloralWhite)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_Lasthit", "小兵尾刀").SetValue(new Circle(true, Color.Lime)));
+            menuDrawing.AddItem(new MenuItem("orb_Draw_nearKill", "将要击杀小兵").SetValue(new Circle(true, Color.Gold)));
             menu.AddSubMenu(menuDrawing);
 
             var menuMisc = new Menu("其他", "orb_Misc");
             menuMisc.AddItem(new MenuItem("orb_Misc_Holdzone", "待命区域").SetValue(new Slider(50, 0, 200)));
             menuMisc.AddItem(new MenuItem("orb_Misc_Farmdelay", "补兵延迟").SetValue(new Slider(0, 0, 300)));
             if (MyHero.ChampionName == "Azir")
-                    new MenuItem("azir_Misc_Farmdelay", "士兵攻击延迟").SetValue(new Slider(0, 0, 300)));
-            }
+                menuMisc.AddItem(new MenuItem("azir_Misc_Farmdelay", "士兵攻击延迟").SetValue(new Slider(0, 0, 300)));
             menuMisc.AddItem(new MenuItem("orb_Misc_ExtraWindUp", "额外延迟").SetValue(new Slider(80, 200, 0)));
-            menuMisc.AddItem(
-                new MenuItem("orb_Misc_AutoWindUp", "自动设置").SetValue(new KeyBind("O".ToCharArray()[0], KeyBindType.Press)));
-            menuMisc.AddItem(new MenuItem("orb_Misc_Priority_Unit", "优先模式").SetValue(new StringList(new[] { "小兵", "英雄" })));
+            menuMisc.AddItem(new MenuItem("orb_Misc_AutoWindUp", "自动设置").SetValue(new KeyBind("O".ToCharArray()[0], KeyBindType.Press)));           
+			menuMisc.AddItem(new MenuItem("orb_Misc_Priority_Unit", "优先模式").SetValue(new StringList(new[] { "小兵", "英雄" })));
             menuMisc.AddItem(new MenuItem("orb_Misc_Humanizer", "人性化延迟").SetValue(new Slider(80, 50, 500)));
             menuMisc.AddItem(new MenuItem("orb_Misc_AllMovementDisabled", "禁止所有移动").SetValue(false));
             menuMisc.AddItem(new MenuItem("orb_Misc_AllAttackDisabled", "禁止自动攻击").SetValue(false));
@@ -111,37 +101,32 @@ namespace DZDraven_Reloaded
                 menuModes.AddSubMenu(modeCombo);
 
                 var modeHarass = new Menu("骚扰", "orb_Modes_Harass");
-                modeHarass.AddItem(
-                    new MenuItem("Harass_Key", "骚扰").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+                modeHarass.AddItem(new MenuItem("Harass_Key", "骚扰").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 modeHarass.AddItem(new MenuItem("Harass_move", "移动").SetValue(true));
                 modeHarass.AddItem(new MenuItem("Harass_attack", "攻击").SetValue(true));
                 modeHarass.AddItem(new MenuItem("Harass_Lasthit", "补刀").SetValue(true));
                 menuModes.AddSubMenu(modeHarass);
 
                 var modeLaneClear = new Menu("清线", "orb_Modes_LaneClear");
-                modeLaneClear.AddItem(
-                    new MenuItem("LaneClear_Key", "清线").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+                modeLaneClear.AddItem(new MenuItem("LaneClear_Key", "清线").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
                 modeLaneClear.AddItem(new MenuItem("LaneClear_move", "移动").SetValue(true));
                 modeLaneClear.AddItem(new MenuItem("LaneClear_attack", "攻击").SetValue(true));
                 menuModes.AddSubMenu(modeLaneClear);
 
                 var modeLaneFreeze = new Menu("控线", "orb_Modes_LaneFreeze");
-                modeLaneFreeze.AddItem(
-                    new MenuItem("LaneFreeze_Key", "控线").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
+                modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_Key", "控线").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
                 modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_move", "移动").SetValue(true));
                 modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_attack", "攻击").SetValue(true));
                 menuModes.AddSubMenu(modeLaneFreeze);
 
                 var modeLasthit = new Menu("补刀", "orb_Modes_LastHit");
-                modeLasthit.AddItem(
-                    new MenuItem("LastHit_Key", "补刀").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
+                modeLasthit.AddItem(new MenuItem("LastHit_Key", "补刀").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
                 modeLasthit.AddItem(new MenuItem("LastHit_move", "移动").SetValue(true));
                 modeLasthit.AddItem(new MenuItem("LastHit_attack", "攻击").SetValue(true));
                 menuModes.AddSubMenu(modeLasthit);
 
                 var modeFlee = new Menu("逃跑", "orb_Modes_Flee");
-                modeFlee.AddItem(
-                    new MenuItem("Flee_Key", "逃跑").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
+                modeFlee.AddItem(new MenuItem("Flee_Key", "逃跑").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
                 menuModes.AddSubMenu(modeFlee);
             }
             menu.AddSubMenu(menuModes);

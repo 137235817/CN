@@ -101,14 +101,10 @@ namespace DZDraven_Reloaded
             Menu.AddSubMenu(new Menu("显示设置", "Drawing"));
 
             //Drawings Menu
-            Menu.SubMenu("Drawing")
-                .AddItem(new MenuItem("DrawE", "显示E范围").SetValue(new Circle(true, Color.MediumPurple)));
-            Menu.SubMenu("Drawing")
-                .AddItem(new MenuItem("DrawCRange", "显示接斧头范围").SetValue(new Circle(true, Color.RoyalBlue)));
-            Menu.SubMenu("Drawing")
-                .AddItem(new MenuItem("DrawRet", "显示十字线").SetValue(new Circle(true, Color.Yellow)));
-            Menu.SubMenu("Drawing")
-                .AddItem(new MenuItem("DrawNextRet", "显示下次接斧头位置").SetValue(new Circle(true, Color.Orange)));
+            Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawE", "显示E范围").SetValue(new Circle(true, Color.MediumPurple)));
+            Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawCRange", "显示接斧头范围").SetValue(new Circle(true, Color.RoyalBlue)));
+            Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawRet", "显示十字线").SetValue(new Circle(true, Color.Yellow)));
+            Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawNextRet", "显示下次接斧头地点").SetValue(new Circle(true, Color.Orange)));
             Menu.AddToMainMenu();
 
             Q = new Spell(SpellSlot.Q);

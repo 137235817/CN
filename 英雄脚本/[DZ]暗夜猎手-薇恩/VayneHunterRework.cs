@@ -58,22 +58,22 @@ namespace VayneHunterRework
             Menu.AddSubMenu(new Menu("骚扰", "Harrass"));
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseQH", "使用Q")).SetValue(true);
             Menu.SubMenu("Harrass").AddItem(new MenuItem("UseEH", "使用E").SetValue(true));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
+            Menu.SubMenu("Harrass").AddItem(new MenuItem("QManaH", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Harrass").AddItem(new MenuItem("EManaH", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
 
             Menu.AddSubMenu(new Menu("补兵", "Farm"));
             Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLH", "使用Q补刀")).SetValue(true);
             Menu.SubMenu("Farm").AddItem(new MenuItem("UseQLC", "使用Q清线")).SetValue(true);
-            Menu.SubMenu("Combo").AddItem(new MenuItem("QManaC", "Q法力值控制%").SetValue(new Slider(35, 1, 100)));
-            Menu.SubMenu("Combo").AddItem(new MenuItem("EManaC", "E法力值控制%").SetValue(new Slider(20, 1, 100)));
+            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLH", "Q补刀法力值控制%").SetValue(new Slider(35, 1, 100)));
+            Menu.SubMenu("Farm").AddItem(new MenuItem("QManaLC", "Q清线法力值控制%").SetValue(new Slider(35, 1, 100)));
 
             var MiscSubMenu = new Menu("其他", "Misc");
 
             var MiscTSubMenu = new Menu("其他 - 翻滚设置", "MiscT");
             {
-                miscTSubMenu.AddItem(new MenuItem("SmartQ", "优先QE").SetValue(false));
-                miscTSubMenu.AddItem(new MenuItem("NoQEn", "不往人堆里Q").SetValue(true));
-                miscTSubMenu.AddItem(new MenuItem("NoAAStealth", "潜行时不使用平A").SetValue(false));
+                MiscTSubMenu.AddItem(new MenuItem("SmartQ", "优先QE").SetValue(false));
+                MiscTSubMenu.AddItem(new MenuItem("NoQEn", "不往人堆里Q").SetValue(true));
+                MiscTSubMenu.AddItem(new MenuItem("NoAAStealth", "潜行时不使用平A").SetValue(false));
                 MiscTSubMenu
                     .AddItem(
                         new MenuItem("WallTumble", "翻墙").SetValue(new KeyBind("Y".ToCharArray()[0],
@@ -82,19 +82,19 @@ namespace VayneHunterRework
             var MiscCSubMenu = new Menu("其他 - E设置", "MiscC");
             {
                 MiscCSubMenu.AddItem(new MenuItem("ENext", "手动按键E墙").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
-                miscCSubMenu.AddItem(new MenuItem("PushDistance", "E推开距离").SetValue(new Slider(425, 400, 500)));
-                miscCSubMenu.AddItem(new MenuItem("CondemnTurret", "尝试E到塔上").SetValue(false));
-                miscCSubMenu.AddItem(new MenuItem("CondemnFlag", "E到皇子的旗帜上").SetValue(true));
-                miscCSubMenu.AddItem(new MenuItem("AutoE", "自动E").SetValue(true));
-                miscCSubMenu.AddItem(new MenuItem("AutoEKS", "智能使用E击杀").SetValue(true));
-                miscCSubMenu.AddItem(new MenuItem("NoEEnT", "敌方塔下不使用E").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("PushDistance", "E推开距离").SetValue(new Slider(425, 400, 500)));
+                MiscCSubMenu.AddItem(new MenuItem("CondemnTurret", "尝试E到塔上").SetValue(false));
+                MiscCSubMenu.AddItem(new MenuItem("CondemnFlag", "E到皇子的旗帜上").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("AutoE", "自动E").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("AutoEKS", "智能使用E击杀").SetValue(true));
+                MiscCSubMenu.AddItem(new MenuItem("NoEEnT", "敌方塔下不使用E").SetValue(true));
             }
             var MiscGSubMenu = new Menu("其他 - 一般", "MiscG");
             {
 
-                miscGSubMenu.AddItem(new MenuItem("Packets", "封包释放").SetValue(true));
-                miscGSubMenu.AddItem(new MenuItem("AntiGP", "防突进")).SetValue(true);
-                miscGSubMenu.AddItem(new MenuItem("Interrupt", "打断技能").SetValue(true));
+                MiscGSubMenu.AddItem(new MenuItem("Packets", "封包释放").SetValue(true));
+                MiscGSubMenu.AddItem(new MenuItem("AntiGP", "防突进")).SetValue(true);
+                MiscGSubMenu.AddItem(new MenuItem("Interrupt", "打断技能").SetValue(true));
                 MiscGSubMenu
                     .AddItem(new MenuItem("SpecialFocus", "优先攻击W标记两次以上目标").SetValue(false));
                 MiscGSubMenu

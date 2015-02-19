@@ -167,7 +167,7 @@ namespace KurisuNidalee
             nidaHarass.AddItem(new MenuItem("humanqpct", "法力值控制%")).SetValue(new Slider(70));
             _mainMenu.AddSubMenu(nidaHarass);
 
-            var nidaJungle = new Menu("豹女: 清野", "jungleclear")
+            var nidaJungle = new Menu("豹女: 清野", "jungleclear");
             nidaJungle.AddItem(new MenuItem("jghumanq", "使用标枪")).SetValue(true);
             nidaJungle.AddItem(new MenuItem("jghumanw", "使用W（人）")).SetValue(true);
             nidaJungle.AddItem(new MenuItem("jgcougarq", "使用Q（豹）")).SetValue(true);
@@ -201,13 +201,14 @@ namespace KurisuNidalee
             nidaD.AddItem(new MenuItem("drawQ", "Q范围")).SetValue(new Circle(true, Color.FromArgb(150, Color.White)));
             nidaD.AddItem(new MenuItem("drawW", "W范围")).SetValue(new Circle(true, Color.FromArgb(150, Color.White)));
             nidaD.AddItem(new MenuItem("drawE", "E范围")).SetValue(new Circle(true, Color.FromArgb(150, Color.White)));
-            nidaD.AddItem(new MenuItem("drawline", "Draw Target")).SetValue(true);
+            nidaD.AddItem(new MenuItem("drawline", "显示目标")).SetValue(true);
             nidaD.AddItem(new MenuItem("drawcds", "显示CD")).SetValue(true);
             _mainMenu.AddSubMenu(nidaD);
 
             var nidaM = new Menu("豹女: 其他", "misc");
             nidaM.AddItem(new MenuItem("useitems", "使用物品")).SetValue(true);
-            nidaM.AddItem(new MenuItem("useignote", "使用点燃"))SetValue(false);
+            nidaM.AddItem(new MenuItem("useignote", "使用引燃"));
+			nidaM.AddItem(new MenuItem("dash", "快速Q")).SetValue(false);
             nidaM.AddItem(new MenuItem("gapp", "Q防突进")).SetValue(false);
             nidaM.AddItem(new MenuItem("imm", "Q/W静止目标")).SetValue(true);
             nidaM.AddItem(new MenuItem("javelinks", "Q击杀(人)")).SetValue(true);

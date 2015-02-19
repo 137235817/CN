@@ -84,7 +84,7 @@ namespace Gnar
             subSubMenu = subMenu.AddSubMenu("纳尔");
             ProcessLink("harassUseQ", subSubMenu.AddLinkedBool("使用Q"));
             // Mega
-            subSubMenu = subMenu.AddSubMenu("巨型纳尔");;
+            subSubMenu = subMenu.AddSubMenu("巨型纳尔");
             ProcessLink("harassUseQMega", subSubMenu.AddLinkedBool("使用Q"));
             ProcessLink("harassUseWMega", subSubMenu.AddLinkedBool("使用W"));
             // General
@@ -102,8 +102,8 @@ namespace Gnar
             ProcessLink("waveUseWMega", subSubMenu.AddLinkedBool("使用W"));
             ProcessLink("waveUseEMega", subSubMenu.AddLinkedBool("使用E"));
             // Gernal
-            ProcessLink("waveUseItems", subMenu.AddLinkedBool("Use items"));
-            ProcessLink("waveActive", subMenu.AddLinkedKeyBind("WaveClear active", 'V', KeyBindType.Press));
+            ProcessLink("waveUseItems", subMenu.AddLinkedBool("使用物品"));
+            ProcessLink("waveActive", subMenu.AddLinkedKeyBind("清线", 'V', KeyBindType.Press));
 
 
             // ----- JungleClear
@@ -118,7 +118,7 @@ namespace Gnar
             ProcessLink("jungleUseEMega", subSubMenu.AddLinkedBool("使用E"));
             // General
             ProcessLink("jungleUseItems", subMenu.AddLinkedBool("使用物品"));
-            ProcessLink("jungleActive", subMenu.AddLinkedKeyBind("清野, 'V', KeyBindType.Press));
+            ProcessLink("jungleActive", subMenu.AddLinkedKeyBind("清野", 'V', KeyBindType.Press));
 
             // ----- Flee
             subMenu = _menu.MainMenu.AddSubMenu("逃跑");
