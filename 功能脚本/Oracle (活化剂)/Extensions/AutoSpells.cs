@@ -31,11 +31,11 @@ namespace Oracle.Extensions
             CreateMenuItem(95, "karmasolkimshield", "鼓舞(天启者)", "karmashield", SpellSlot.E);
             CreateMenuItem(95, "lulue", "帮忙，皮克斯(璐璐)", "lulushield", SpellSlot.E);
             CreateMenuItem(95, "luxprismaticwave", "曲光屏障(光辉)", "luxshield", SpellSlot.W);
-            CreateMenuItem(95, "nautiluspiercinggaze", "泰坦之怒(泰坦)", "nautshield", SpellSlot.W);
+            CreateMenuItem(95, "nautiluspiercinggaze", "泰坦之怒(泰坦)", "nautilusshield", SpellSlot.W);
             CreateMenuItem(95, "orianaredactcommand", "指令：防卫(发条)", "oriannashield", SpellSlot.E);
             CreateMenuItem(95, "shenfeint", "奥义！空我(慎)", "shenshield", SpellSlot.W, false);
             CreateMenuItem(95, "moltenshield", "熔岩护盾(安妮)", "annieshield", SpellSlot.E);
-            CreateMenuItem(95, "jarvanivgoldenaegis", "黄金圣盾(皇子)", "j4shield", SpellSlot.W);
+            CreateMenuItem(95, "jarvanivgoldenaegis", "黄金圣盾(皇子)", "jarvanivshield", SpellSlot.W);
             CreateMenuItem(95, "blindmonkwone", "金钟罩/铁布衫(瞎子)", "leeshield", SpellSlot.W, false);
             CreateMenuItem(95, "rivenfeint", "勇往直前(瑞文)", "rivenshield", SpellSlot.E, false);
             CreateMenuItem(95, "fiorariposte", "劳伦特心眼刀(剑姬)", "fiorashield", SpellSlot.W, false);
@@ -259,7 +259,8 @@ namespace Oracle.Extensions
             }
 
             var aHealthPercent = target.Health/target.MaxHealth*100;
-            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
+            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling() ||
+                !target.IsValidState())
             {
                 return;
             }
@@ -334,8 +335,11 @@ namespace Oracle.Extensions
                 return;
 
             var aHealthPercent = target.Health / target.MaxHealth * 100;
-            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling())
+            if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() || Me.IsRecalling() ||
+                !target.IsValidState())
+            {
                 return;
+            }
 
             if (_mainMenu.Item("use" + menuvar + "Norm").GetValue<bool>())
             {
@@ -429,7 +433,7 @@ namespace Oracle.Extensions
                 return;
 
             if (!spell.IsReady() || !_menuConfig.Item("ason" + target.SkinName).GetValue<bool>() ||
-                Me.IsRecalling() ||  Me.InFountain())
+                Me.IsRecalling() ||  Me.InFountain() || !target.IsValidState())
             {
                 return;
             }

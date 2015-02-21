@@ -40,16 +40,16 @@ namespace Oracle
             CustomEvents.Game.OnGameLoad += OnGameLoad;
         }
 
+        public static int LastTick;
         public static bool Spell;
         public static bool Stealth;
         public static bool Danger;
         public static bool Dangercc;
         public static bool DangerUlt;
         public static string FileName;
-        public static int LastTick;
         public static bool CanManamune;
         public static string ChampionName;
-        public const string Revision = "221";
+        public const string Revision = "222";
 
         private static void OnGameLoad(EventArgs args)
         {
@@ -57,7 +57,7 @@ namespace Oracle
       
             ChampionName = Me.ChampionName;
             Game.OnGameUpdate += Game_OnGameUpdate;
-            Game.PrintChat("<font color=\"#1FFF8F\">Oracle# r." + Revision + " -</font><font color=\"#FFFFCC\"> by Kurisu</font>");
+            Game.PrintChat("<font color=\"#1FFF8F\">娲诲寲鍓倊" + Revision + " -</font> 鍔犺浇鎴愬姛<font color=\"#00BFFF\">Vee姹夊寲!</font>");
 
             if (!Directory.Exists(Config.LeagueSharpDirectory + @"\Logs\Oracle"))
             {
@@ -70,7 +70,7 @@ namespace Oracle
 
             else
             {
-                Game.PrintChat("<font color=\"#FFFFCC\">Feel free to donate to</font>: xrobinsong@gmail.com");
+                Game.PrintChat("<font color=\"#FFFFCC\">Do appreciate donations via Paypal </font>: xrobinsong@gmail.com");
             }
 
             try
@@ -83,7 +83,6 @@ namespace Oracle
                 if (Revision != gitrevision)
                 {
                     Game.PrintChat("<font color=\"#FFFFCC\"><b>Oracle is outdated, please Update!</b></font>");
-                    Game.PrintChat("<font color=\"#FFFFCC\"><b>If comiple error update Common!</b></font>");
                 }
             }
 
@@ -92,7 +91,7 @@ namespace Oracle
                 Logger(LogType.Error, "Something went wrong with update checker!");
             }
 
-            Origin = new Menu("Oracle", "oracle", true);
+            Origin = new Menu("Oracle(活化剂)", "oracle", true);
             Cleansers.Initialize(Origin);
             Defensives.Initialize(Origin);
             Summoners.Initialize(Origin);
@@ -100,8 +99,8 @@ namespace Oracle
             Consumables.Initialize(Origin);
             AutoSpells.Initialize(Origin);
 
-            var config = new Menu("Oracle Config", "oracleconfig");
-            var dangerMenu = new Menu("Dangerous Config", "dangerconfig");
+            var config = new Menu("活化剂配置", "oracleconfig");
+            var dangerMenu = new Menu("危险设置", "dangerconfig");
 
             foreach (var i in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.Team != Me.Team))
             {
@@ -113,41 +112,44 @@ namespace Oracle
                     var danger = spell.Spellslot.ToString() == "R" ||
                                     spell.CcType != CcType.No && (spell.Type == SpellType.Skillshot || spell.Type == SpellType.Targeted);
 
-                    menu.AddItem(new MenuItem(spell.Name + "ccc", spell.Name + " | " + spell.Spellslot)).SetValue(danger);
+                    menu.AddItem(new MenuItem(spell.Name + "ccc", spell.Name + " - " + spell.Spellslot)).SetValue(danger);
                 }
 
                 dangerMenu.AddSubMenu(menu);
             }
 
             config.AddItem(
-                new MenuItem("usecombo", "Combo (Active)")
+                new MenuItem("usecombo", "连招(开启)")
                     .SetValue(new KeyBind(32, KeyBindType.Press)));
 
             config.AddSubMenu(dangerMenu);
 
-            var cskills = new Menu("Cleanse Special", "cskills");
-            foreach (var debuff in GameBuff.CleanseBuffs)
-                cskills.AddItem(new MenuItem("cure" + debuff.BuffName, debuff.ChampionName + " | " + debuff.Slot))
-                    .SetValue(true);
+            var cskills = new Menu("解除控制", "cskills");
+            foreach (var i in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.Team != Me.Team))
+            {
+                foreach (var debuff in GameBuff.CleanseBuffs.Where(t => t.ChampionName == i.ChampionName))
+                    cskills.AddItem(new MenuItem("cure" + debuff.BuffName, debuff.ChampionName + " - " + debuff.Slot))
+                        .SetValue(true);
+            }
             config.AddSubMenu(cskills);
 
-            var cleanseMenu = new Menu("Cleanse Debuffs", "cdebufs");
-            cleanseMenu.AddItem(new MenuItem("stun", "Stuns")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("charm", "Charms")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("taunt", "Taunts")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("fear", "Fears")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("snare", "Snares")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("silence", "Silences")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("suppression", "Supression")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("polymorph", "Polymorphs")).SetValue(true);
-            cleanseMenu.AddItem(new MenuItem("blind", "Blinds")).SetValue(false);
-            cleanseMenu.AddItem(new MenuItem("slow", "Slows")).SetValue(false);
-            cleanseMenu.AddItem(new MenuItem("poison", "Poisons")).SetValue(false);
+            var cleanseMenu = new Menu("清除减益效果", "cdebufs");
+            cleanseMenu.AddItem(new MenuItem("stun", "眩晕")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("charm", "魅惑")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("taunt", "嘲讽")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("fear", "恐惧")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("snare", "陷阱")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("silence", "沉默")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("suppression", "虚弱")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("polymorph", "变形")).SetValue(true);
+            cleanseMenu.AddItem(new MenuItem("blind", "致盲")).SetValue(false);
+            cleanseMenu.AddItem(new MenuItem("slow", "减速")).SetValue(false);
+            cleanseMenu.AddItem(new MenuItem("poison", "中毒")).SetValue(false);
             config.AddSubMenu(cleanseMenu);
 
-            var debugMenu = new Menu("Debugging", "debugmenu");
-            debugMenu.AddItem(new MenuItem("dbool", "Enable Console Debugging")).SetValue(false);
-            debugMenu.AddItem(new MenuItem("catchobject", "Log object names"))
+            var debugMenu = new Menu("调试设置", "debugmenu");
+            debugMenu.AddItem(new MenuItem("dbool", "启用调试控制台")).SetValue(false);
+            debugMenu.AddItem(new MenuItem("catchobject", "载入物品名称"))
                 .SetValue(new KeyBind(89, KeyBindType.Press));
             config.AddSubMenu(debugMenu);
 
@@ -330,7 +332,7 @@ namespace Oracle
                 CurrentTarget = targ;
             }
 
-            // Get dangerous buff update for zhonya (vladimir R) etc)
+            // Get dangerous buff update for zhonya (vladimir R) etc
             foreach (var buff in GameBuff.EvadeBuffs)
             {
                 foreach (var aura in Friendly().Buffs)
@@ -692,11 +694,17 @@ namespace Oracle
             return target;
         }
 
-        private static Obj_AI_Hero GetEnemy(string championnmame)
+        public static Obj_AI_Hero GetEnemy(string championnmame)
         {
             return
                 ObjectManager.Get<Obj_AI_Hero>()
                     .First(enemy => enemy.Team != Me.Team && enemy.ChampionName == championnmame);
+        }
+
+        public static bool IsValidState(this Obj_AI_Hero target)
+        {
+            return !target.HasBuffOfType(BuffType.SpellShield) && !target.HasBuffOfType(BuffType.SpellImmunity) &&
+                   !target.HasBuffOfType(BuffType.Invulnerability);
         }
 
         public static int CountHerosInRange(this Obj_AI_Hero target, bool checkteam, float range = 1200f)

@@ -121,7 +121,7 @@ namespace Oracle.Extensions
                 _bb = true;
                 var Barrier = new Menu("屏障", "mbarrier");
                 Barrier.AddItem(new MenuItem("useBarrier", "启用")).SetValue(true);
-                Barrier.AddItem(new MenuItem("useBarrierPct", "血量低于（%）使用 ")).SetValue(new Slider(25, 1));
+                Barrier.AddItem(new MenuItem("useBarrierPct", "血量低于（%）使用 ")).SetValue(new Slider(20, 1));
                 Barrier.AddItem(new MenuItem("useBarrierDmg", "伤害高于（%）使用")).SetValue(new Slider(40, 1));
                 Barrier.AddItem(new MenuItem("barrierDot", "被引燃时使用")).SetValue(true);
                 _mainMenu.AddSubMenu(Barrier);
