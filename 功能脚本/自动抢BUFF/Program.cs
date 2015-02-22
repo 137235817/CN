@@ -72,7 +72,7 @@ namespace Snitched
             GameObject.OnDelete += GameObjectOnOnDelete;
             Game.OnGameUpdate += Game_OnGameUpdate;
 
-            Game.PrintChat("<font color=\"#7CFC00\"><b>鑷姩鎶uff:</b></font> 鍔犺浇鎴愬姛 Vee姹夊寲");
+            Game.PrintChat("<font color=\"#7CFC00\"><b>Snitched:</b></font> Loaded");
         }
 
 
@@ -187,7 +187,7 @@ namespace Snitched
                     var time = (1000 * Player.Distance(Baron) / spell.Speed) + spell.Delay * 1000 + Game.Ping / 2f;
                     var healthPrediciton = HealthPrediction.GetHealthPrediction(Baron, (int)time);
 
-                    if (!(spell.GetDamage(Baron) > healthPrediciton))
+                    if (!(spell.GetDamage(Baron) > Baron.Health))
                     {
                         continue;
                     }
@@ -205,7 +205,7 @@ namespace Snitched
                     var time = (1000 * Player.Distance(Dragon) / spell.Speed) + spell.Delay * 1000 + Game.Ping / 2f;
                     var healthPrediciton = HealthPrediction.GetHealthPrediction(Dragon, (int)time);
 
-                    if (!(spell.GetDamage(Dragon) > healthPrediciton))
+                    if (!(spell.GetDamage(Dragon) > Dragon.Health))
                     {
                         continue;
                     }
@@ -224,7 +224,7 @@ namespace Snitched
                     var time = (1000 * Player.Distance(blue) / spell.Speed) + spell.Delay * 1000 + Game.Ping / 2f;
                     var healthPrediciton = HealthPrediction.GetHealthPrediction(blue, (int)time);
 
-                    if (!(spell.GetDamage(blue) > healthPrediciton))
+                    if (!(spell.GetDamage(blue) > blue.Health))
                     {
                         continue;
                     }
@@ -243,7 +243,7 @@ namespace Snitched
                     var time = (1000 * Player.Distance(red) / spell.Speed) + spell.Delay * 1000 + Game.Ping / 2f;
                     var healthPrediciton = HealthPrediction.GetHealthPrediction(red, (int)time);
 
-                    if (!(spell.GetDamage(red) > healthPrediciton))
+                    if (!(spell.GetDamage(red) > red.Health))
                     {
                         continue;
                     }
@@ -262,7 +262,7 @@ namespace Snitched
                     var time = (1000 * Player.Distance(hero) / spell.Speed) + spell.Delay * 1000 + Game.Ping / 2f;
                     var healthPrediciton = HealthPrediction.GetHealthPrediction(hero, (int)time);
 
-                    if (!(spell.GetDamage(hero) > healthPrediciton))
+                    if (!(spell.GetDamage(hero) > hero.Health))
                     {
                         continue;
                     }
@@ -280,10 +280,10 @@ namespace Snitched
 
         private static void CreateMenu()
         {
-            Menu = new Menu("抢Buff", "cmSnitched" + Player.ChampionName, true);
+            Menu = new Menu("Snitched", "cmSnitched" + Player.ChampionName, true);
 
             // Dragion and baron stealer
-            var spellsMenu = new Menu("大龙/小龙", "epicStealz");
+            var spellsMenu = new Menu("Drag/Baron Stealer", "epicStealz");
             foreach (var name in Spells)
             {
                 spellsMenu.AddItem(new MenuItem("Steal" + name.Slot, "Use " + name.Slot).SetValue(true));
@@ -299,7 +299,7 @@ namespace Snitched
             Menu.AddSubMenu(buffsMenu);
 
             // Kill Secure menu
-            var ksMenu = new Menu("高几率抢龙", "epicKillzStealz");
+            var ksMenu = new Menu("Kill Secure", "epicKillzStealz");
             foreach (var name in Spells)
             {
                 ksMenu.AddItem(new MenuItem("KS" + name.Slot, "Use " + name.Slot).SetValue(name.Slot != SpellSlot.R));
@@ -307,11 +307,11 @@ namespace Snitched
             Menu.AddSubMenu(ksMenu);
 
             Menu.AddItem(
-                new MenuItem("SortRule", "优先技能排序").SetValue(
-                    new StringList(new[] { "伤害最高", "伤害最低", "最大范围", "最小范围", "释放时间最短" })));
+                new MenuItem("SortRule", "Sort Spell Priority").SetValue(
+                    new StringList(new[] { "Most Damage", "Least Damage", "Biggest Range", "Smallest Range", "Smallest Cast Time" })));
 
-            Menu.AddItem(new MenuItem("Enabled", "启用 (自动)").SetValue(true));
-            Menu.AddItem(new MenuItem("EnabledKeybind", "启用 (按键)").SetValue(new KeyBind(84, KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Enabled", "Enabled (Toggle)").SetValue(true));
+            Menu.AddItem(new MenuItem("EnabledKeybind", "Enabled (Press)").SetValue(new KeyBind(84, KeyBindType.Press)));
 
             Menu.AddToMainMenu();
         }
