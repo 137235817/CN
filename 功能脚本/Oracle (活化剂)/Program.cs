@@ -100,11 +100,12 @@ namespace Oracle
             AutoSpells.Initialize(Origin);
 
             var config = new Menu("活化剂配置", "oracleconfig");
-            var dangerMenu = new Menu("危险设置", "dangerconfig");
+            var dangerMenu = new Menu("危险设置-慎重", "dangerconfig");
 
             foreach (var i in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.Team != Me.Team))
             {
-                var menu = new Menu(i.SkinName, i.SkinName + "cccmenu");
+                var menu = new Menu(i.ChampionName, i.ChampionName + "cccmenu");
+
                 foreach (
                     var spell in
                         TargetSpellDatabase.Spells.Where(spell => spell.ChampionName == i.ChampionName.ToLower()))
@@ -124,7 +125,7 @@ namespace Oracle
 
             config.AddSubMenu(dangerMenu);
 
-            var cskills = new Menu("解除控制", "cskills");
+            var cskills = new Menu("清除减益", "cskills");
             foreach (var i in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.Team != Me.Team))
             {
                 foreach (var debuff in GameBuff.CleanseBuffs.Where(t => t.ChampionName == i.ChampionName))
