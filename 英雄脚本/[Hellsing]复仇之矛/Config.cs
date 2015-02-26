@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-
 using LeagueSharp.Common;
 
 using Color = System.Drawing.Color;
@@ -84,10 +83,12 @@ namespace Kalista
             ProcessLink("miscBigE", subMenu.AddLinkedBool("小兵数量多时使用E"));
             ProcessLink("miscUseR", subMenu.AddLinkedBool("使用大招拯救辅助"));
             ProcessLink("miscAutoE", subMenu.AddLinkedBool("当平A不能补刀时使用E"));
+            ProcessLink("miscAutoEchamp", subMenu.AddLinkedBool("当敌人身上有1层以上E且周围小兵可击杀时自动E"));
 
             // Spell settings
             subMenu = _menu.MainMenu.AddSubMenu("技能设置");
             ProcessLink("spellReductionE", subMenu.AddLinkedSlider("E伤害削弱", 20));
+
             // Items
             subMenu = _menu.MainMenu.AddSubMenu("物品");
             ProcessLink("itemsCutlass", subMenu.AddLinkedBool("使用比尔吉沃特弯刀"));
