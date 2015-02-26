@@ -34,7 +34,7 @@ namespace xSaliceReligionAIO.Champions
         {
             //intalize spell
             Q = new Spell(SpellSlot.Q, 900);
-            W = new Spell(SpellSlot.W, 800);
+            W = new Spell(SpellSlot.W, 650);
             E = new Spell(SpellSlot.E, 875);
             R = new Spell(SpellSlot.R, 850);
 
@@ -51,8 +51,7 @@ namespace xSaliceReligionAIO.Champions
         private void LoadMenu()
         {
             //key
-            var key = new Menu("键位", "Key");
-            {
+            var key = new Menu("键位", "Key");{
                 key.AddItem(new MenuItem("ComboActive", "连招!",true).SetValue(new KeyBind(32, KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActive", "骚扰!",true).SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActiveT", "骚扰 (自动)!",true).SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
@@ -62,6 +61,7 @@ namespace xSaliceReligionAIO.Champions
                 menu.AddSubMenu(key);
             }
 
+            //Combo menu:
             //Combo menu:
             var combo = new Menu("连招", "Combo");
             {
@@ -177,9 +177,6 @@ namespace xSaliceReligionAIO.Champions
                 damage += Player.GetSpellDamage(enemy, SpellSlot.R)*RCount();
             else if (R.IsReady())
                 damage += Player.GetSpellDamage(enemy, SpellSlot.R) * 3;
-
-            if (enemy.HasBuffOfType(BuffType.Charm) || enemy.HasBuffOfType(BuffType.Taunt))
-                damage = damage * 1.2;
 
             damage = ActiveItems.CalcDamage(enemy, damage);
 
@@ -573,7 +570,7 @@ namespace xSaliceReligionAIO.Champions
                 E.Cast(gapcloser.Sender);
         }
 
-        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             if (!menu.Item("UseInt", true).GetValue<bool>()) return;
 

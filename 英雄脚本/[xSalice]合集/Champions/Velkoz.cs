@@ -66,8 +66,7 @@ namespace xSaliceReligionAIO.Champions
             var spell = new Menu("技能菜单", "Spell");
             {
                 //Q Menu
-                var qMenu = new Menu("Q 技能", "QSpell"); 
-                {
+                var qMenu = new Menu("Q 技能", "QSpell"); {
                     qMenu.AddItem(new MenuItem("qSplit", "自动 Q", true).SetValue(true));
                     qMenu.AddItem(new MenuItem("qAngle", "智能 Q 角度", true).SetValue(true));
                     spell.AddSubMenu(qMenu);
@@ -124,8 +123,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Drawings menu:
-            var draw = new Menu("范围显示", "Drawings"); 
-            { 
+            var draw = new Menu("范围显示", "Drawings"); { 
                 draw.AddItem(new MenuItem("QRange", "Q 范围", true).SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
                 draw.AddItem(new MenuItem("WRange", "W 范围", true).SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
                 draw.AddItem(new MenuItem("ERange", "E 范围", true).SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
@@ -283,6 +281,7 @@ namespace xSaliceReligionAIO.Champions
                 E.GetPrediction(target).Hitchance >= HitChance.High)
             {
                 E.Cast(target, packets());
+                return;
             }
 
             //items
@@ -301,19 +300,19 @@ namespace xSaliceReligionAIO.Champions
                 }
             }
 
+            if (useQ && Q.IsReady())
+            {
+                CastQ(target, qDummyTarget, source);
+                return;
+            }
+
             if (useR && R.IsReady() && Player.Distance(target) < R.Range)
             {
                 if (GetUltDmg(target) >= target.Health)
                 {
                     R.Cast(target.ServerPosition);
-                    return;
                 }
 
-            }
-
-            if (useQ && Q.IsReady())
-            {
-                CastQ(target, qDummyTarget, source);
             }
         }
 
@@ -410,25 +409,28 @@ namespace xSaliceReligionAIO.Champions
         {
             foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(1500)))
             {
-                _qSplit.UpdateSourcePosition(_qMissle.Position, _qMissle.Position);
-                PredictionOutput pred = _qSplit.GetPrediction(target);
-
-                Vector2 perpendicular = (_qMissle.EndPosition - _qMissle.StartPosition).To2D().Normalized().Perpendicular();
-
-                Vector2 lineSegment1End = _qMissle.Position.To2D() + perpendicular * _qSplit.Range;
-                Vector2 lineSegment2End = _qMissle.Position.To2D() - perpendicular * _qSplit.Range;
-
-                float d1 = pred.UnitPosition.To2D().Distance(_qMissle.Position.To2D(), lineSegment1End, true);
-                //Render.Circle.DrawCircle(lineSegment1End.To3D(), 50, Color.Blue);
-                float d2 = pred.UnitPosition.To2D().Distance(_qMissle.Position.To2D(), lineSegment2End, true);
-                //Render.Circle.DrawCircle(lineSegment2End.To3D(), 50, Color.Red);
-
-                //cast split
-                if ((d1 < _qSplit.Width || d2 < _qSplit.Width) && pred.Hitchance >= HitChance.Medium)
+                if (_qMissle != null)
                 {
-                    Q.Cast();
-                    _qMissle = null;
-                    //Game.PrintChat("splitted");
+                    _qSplit.UpdateSourcePosition(_qMissle.Position, _qMissle.Position);
+                    PredictionOutput pred = _qSplit.GetPrediction(target);
+
+                    Vector2 perpendicular = (_qMissle.EndPosition - _qMissle.StartPosition).To2D().Normalized().Perpendicular();
+
+                    Vector2 lineSegment1End = _qMissle.Position.To2D() + perpendicular * _qSplit.Range;
+                    Vector2 lineSegment2End = _qMissle.Position.To2D() - perpendicular * _qSplit.Range;
+
+                    float d1 = pred.UnitPosition.To2D().Distance(_qMissle.Position.To2D(), lineSegment1End, true);
+                    //Render.Circle.DrawCircle(lineSegment1End.To3D(), 50, Color.Blue);
+                    float d2 = pred.UnitPosition.To2D().Distance(_qMissle.Position.To2D(), lineSegment2End, true);
+                    //Render.Circle.DrawCircle(lineSegment2End.To3D(), 50, Color.Red);
+
+                    //cast split
+                    if ((d1 < _qSplit.Width || d2 < _qSplit.Width) && pred.Hitchance >= HitChance.Medium)
+                    {
+                        Q.Cast();
+                        _qMissle = null;
+                        //Game.PrintChat("splitted");
+                    }
                 }
             }
 
@@ -503,13 +505,11 @@ namespace xSaliceReligionAIO.Champions
                 {
                     int aimMode = menu.Item("rAimer", true).GetValue<StringList>().SelectedIndex;
 
-                    if (aimMode == 0)
-                        Player.Spellbook.UpdateChargedSpell(SpellSlot.R, target.ServerPosition, false, false);
-                    else
-                        Player.Spellbook.UpdateChargedSpell(SpellSlot.R, Game.CursorPos, false, false);
-
-                    return;
+                    Player.Spellbook.UpdateChargedSpell(SpellSlot.R,
+                        aimMode == 0 ? target.ServerPosition : Game.CursorPos, false, false);
                 }
+                Player.Spellbook.UpdateChargedSpell(SpellSlot.R, Game.CursorPos, false, false);
+                return;
             }
 
             if (_qMissle != null && _qMissle.IsValid && menu.Item("qSplit", true).GetValue<bool>())
@@ -558,7 +558,7 @@ namespace xSaliceReligionAIO.Champions
                 E.Cast(gapcloser.Sender, packets());
         }
 
-        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             if (!menu.Item("UseInt", true).GetValue<bool>()) return;
 

@@ -14,7 +14,7 @@ namespace xSaliceReligionAIO
             //Events
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPosibleToInterrupt;
+            Interrupter2.OnInterruptableTarget += Interrupter_OnPosibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             GameObject.OnCreate += GameObject_OnCreate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -69,7 +69,7 @@ namespace xSaliceReligionAIO
 
         //summoners
         private readonly SpellSlot _igniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot");
-        
+        public readonly SpellSlot _flashSlot = ObjectManager.Player.GetSpellSlot("SummonerFlash");
         //items
         protected readonly Items.Item Dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ? new Items.Item(3188, 750) : new Items.Item(3128, 750);
         protected int LastPlaced;
@@ -104,7 +104,7 @@ namespace xSaliceReligionAIO
             menu.AddSubMenu(targetSelectorMenu);
 
             //Orbwalker submenu
-            OrbwalkerMenu.AddItem(new MenuItem("Orbwalker_Mode", "更换走砍", true).SetValue(false));
+            OrbwalkerMenu.AddItem(new MenuItem("Orbwalker_Mode", "更换为L#内置走砍", true).SetValue(true));
             menu.AddSubMenu(OrbwalkerMenu);
             ChooseOrbwalker(menu.Item("Orbwalker_Mode", true).GetValue<bool>());
 
@@ -165,10 +165,14 @@ namespace xSaliceReligionAIO
 
         protected bool Ignite_Ready()
         {
-            if (_igniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
-                return true;
-            return false;
+            return _igniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready;
         }
+
+        protected bool Flash_Ready()
+        {
+            return _flashSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(_flashSlot) == SpellState.Ready;
+        }
+
         protected float GetHealthPercent(Obj_AI_Hero unit = null)
         {
             if (unit == null)
@@ -434,6 +438,13 @@ namespace xSaliceReligionAIO
             myMenu.AddItem(new MenuItem(source + "_Manamanager", "Mana Manager", true).SetValue(new Slider(standard)));
         }
 
+        protected bool FullManaCast()
+        {
+            if (Player.Mana >= QSpell.ManaCost + WSpell.ManaCost + ESpell.ManaCost + RSpell.ManaCost)
+                return true;
+            return false;
+        }
+
         protected bool HasMana(string source)
         {
             if (Player.ManaPercentage() > menu.Item(source + "_Manamanager", true).GetValue<Slider>().Value)
@@ -452,7 +463,7 @@ namespace xSaliceReligionAIO
             //for champs to use
         }
 
-        protected virtual void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected virtual void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             //for champs to use
         }

@@ -161,6 +161,8 @@ namespace xSaliceReligionAIO
             
         }
 
+        private static int _lastCast;
+
         private static void Obj_SpellMissile_OnCreate(GameObject sender, EventArgs args)
         {
             //if(MyHero.Distance(sender.Position) < 500)
@@ -175,7 +177,11 @@ namespace xSaliceReligionAIO
                 Soilders.Add(sender);
                 //Game.PrintChat("" + Soilders.Count);
             }
-            
+
+            if (sender.Name == "Katarina_Base_deathLotus_cas.troy")
+            {
+                _lastCast = Environment.TickCount;
+            }
 
             if (sender.IsMe)
             {
@@ -198,6 +204,8 @@ namespace xSaliceReligionAIO
         {
             CheckAutoWindUp();
             if (CurrentMode == Mode.None || MenuGUI.IsChatOpen || CustomOrbwalkMode || MyHero.IsChannelingImportantSpell() || MyHero.HasBuff("katarinarsound", true))
+                return;
+            if (Environment.TickCount - _lastMovement < Menu.Item("orb_Misc_Humanizer").GetValue<Slider>().Value)
                 return;
             var target = GetPossibleTarget();
             Orbwalk(Game.CursorPos, target);
@@ -315,10 +323,9 @@ namespace xSaliceReligionAIO
         {
             var delay = Menu.Item("orb_Misc_Humanizer").GetValue<Slider>().Value;
 
-            if ((MyHero.ChampionName == "Katarina" || MyHero.ChampionName == "Velkoz") && delay < 400 && (R.IsReady() || MyHero.Spellbook.GetSpell(SpellSlot.R).State == SpellState.Surpressed) && MyHero.CountEnemiesInRange(1000) > 0)
-            {
-                delay = 400;
-            }
+            if (Environment.TickCount - _lastCast < 500)
+                return;
+
             if (Environment.TickCount - _lastMovement < delay)
                 return;
             _lastMovement = Environment.TickCount;

@@ -36,7 +36,7 @@ namespace xSaliceReligionAIO.Champions
                 key.AddItem(new MenuItem("HarassActive", "骚扰!",true).SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("LaneClearActive", "清线!",true).SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("LastHitKey", "补刀!",true).SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
-                key.AddItem(new MenuItem("Combo_Switch", "切换模式 键位",true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+                key.AddItem(new MenuItem("Combo_Switch", "切换模式",true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
                 //add to menu
                 menu.AddSubMenu(key);
             }
@@ -52,6 +52,7 @@ namespace xSaliceReligionAIO.Champions
                 var wMenu = new Menu("W 技能", "WMenu");
                 {
                     wMenu.AddItem(new MenuItem("W_Incoming", "总是使用W抵挡攻击", true).SetValue(true));
+                    wMenu.AddItem(new MenuItem("W_Tower", "塔下不使用W抵挡", true).SetValue(true));
                     wMenu.AddItem(new MenuItem("W_minion", "W抵挡小兵攻击", true).SetValue(false));
                     spellMenu.AddSubMenu(wMenu);
                 }
@@ -454,11 +455,14 @@ namespace xSaliceReligionAIO.Champions
 
         protected override void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs args)
         {
-            SpellSlot castedSlot = Player.GetSpellSlot(args.SData.Name);
-
-            if (castedSlot == SpellSlot.Q)
+            if (unit.IsMe)
             {
-                Q.LastCastAttemptT = Environment.TickCount;
+                SpellSlot castedSlot = Player.GetSpellSlot(args.SData.Name);
+
+                if (castedSlot == SpellSlot.Q)
+                {
+                    Q.LastCastAttemptT = Environment.TickCount;
+                }
             }
 
             if (unit.IsMe)
@@ -473,7 +477,10 @@ namespace xSaliceReligionAIO.Champions
                     if (!menu.Item("W_minion", true).GetValue<bool>() && !(unit is Obj_AI_Hero))
                         return;
 
-                        W.Cast(packets());
+                    if (menu.Item("W_Tower", true).GetValue<bool>() && Player.UnderTurret(true))
+                        return;
+
+                    W.Cast(packets());
                 }
             }
 

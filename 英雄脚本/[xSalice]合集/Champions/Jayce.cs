@@ -38,8 +38,7 @@ namespace xSaliceReligionAIO.Champions
         private void LoadMenu()
         {
             //Keys
-            var key = new Menu("键位", "Keys"); 
-            { 
+            var key = new Menu("键位", "Keys"); { 
                 key.AddItem(new MenuItem("ComboActive", "连招!", true).SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActive", "骚扰!", true).SetValue(new KeyBind("S".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActiveT", "骚扰 (自动)!", true).SetValue(new KeyBind("Y".ToCharArray()[0], KeyBindType.Toggle)));
@@ -48,8 +47,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Combo menu:
-            var combo = new Menu("连招", "Combo"); 
-            { 
+            var combo = new Menu("连招", "Combo"); { 
                 combo.AddItem(new MenuItem("UseQCombo", "使用 炮形态 Q", true).SetValue(true));
                 combo.AddItem(new MenuItem("qSpeed", "QE 速度, 调高=更快, 调低=精准", true).SetValue(new Slider(1600, 400, 2500)));
                 combo.AddItem(new MenuItem("UseWCombo", "使用 炮形态 W", true).SetValue(true));
@@ -76,8 +74,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Misc Menu:
-            var misc = new Menu("其他", "Misc");
-            {
+            var misc = new Menu("其他", "Misc"); { 
                 misc.AddItem(new MenuItem("UseInt", "使用 E 打断技能", true).SetValue(true));
                 misc.AddItem(new MenuItem("UseGap", "使用 E 防止突进", true).SetValue(true));
                 misc.AddItem(new MenuItem("forceGate", "在门口处强行 Q", true).SetValue(false));
@@ -89,8 +86,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Drawings menu:
-            var drawMenu = new Menu("范围显示", "Drawings");
-            {
+            var drawMenu = new Menu("范围显示", "Drawings"); {
                 drawMenu.AddItem(new MenuItem("Draw_Disabled", "禁用所有", true).SetValue(false));
                 drawMenu.AddItem(new MenuItem("Draw_Q", "显示 Q 炮形", true).SetValue(true));
                 drawMenu.AddItem(new MenuItem("Draw_QExtend", "显示 Q 炮形扩展", true).SetValue(true));
@@ -695,7 +691,7 @@ namespace xSaliceReligionAIO.Champions
             }
         }
 
-        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             if (!menu.Item("UseInt", true).GetValue<bool>()) return;
 

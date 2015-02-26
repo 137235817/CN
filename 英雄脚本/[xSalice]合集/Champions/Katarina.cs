@@ -34,8 +34,7 @@ namespace xSaliceReligionAIO.Champions
 
         private void LoadMenu()
         {
-            var key = new Menu("键位", "Key");
-            {
+            var key = new Menu("键位", "Key");{
                 key.AddItem(new MenuItem("ComboActive", "连招!", true).SetValue(new KeyBind(32, KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActive", "骚扰!", true).SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActiveT", "骚扰 (自动)!", true).SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
@@ -377,8 +376,7 @@ namespace xSaliceReligionAIO.Champions
 
             if (useW && W.IsReady())
             {
-                MinionManager.FarmLocation wPos = E.GetCircularFarmLocation(allMinionsW);
-                if (wPos.MinionsHit >= 2)
+                if (allMinionsW.Count > 0)
                     W.Cast();
             }
         }
@@ -399,8 +397,7 @@ namespace xSaliceReligionAIO.Champions
 
             if (useW && W.IsReady())
             {
-                MinionManager.FarmLocation wPos = E.GetCircularFarmLocation(allMinionsW);
-                if (wPos.MinionsHit >= 3)
+                if (allMinionsW.Count > 0)
                     W.Cast();
             }
         }

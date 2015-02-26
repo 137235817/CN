@@ -77,8 +77,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Misc Menu:
-            var misc = new Menu("其他", "Misc"); 
-            {
+            var misc = new Menu("其他", "Misc"); { 
                 misc.AddItem(new MenuItem("UseInt", "使用 R丨打断技能", true).SetValue(true));
                 misc.AddItem(new MenuItem("UseGap", "使用 W丨防止突进", true).SetValue(true));
                 misc.AddItem(new MenuItem("overKill", "检查 伤害", true).SetValue(true));
@@ -102,8 +101,7 @@ namespace xSaliceReligionAIO.Champions
             }
 
             //Drawings menu:
-            var drawing = new Menu("范围显示", "Drawings"); 
-            { 
+            var drawing = new Menu("范围显示", "Drawings"); { 
                drawing.AddItem(new MenuItem("QRange", "Q 范围", true).SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
                drawing.AddItem(new MenuItem("WRange", "W 范围", true).SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
                drawing.AddItem(new MenuItem("ERange", "E 范围", true).SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
@@ -428,7 +426,7 @@ namespace xSaliceReligionAIO.Champions
                 CastE((Obj_AI_Hero)gapcloser.Sender);
         }
 
-        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             if (!menu.Item("UseInt", true).GetValue<bool>()) return;
 

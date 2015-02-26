@@ -197,7 +197,7 @@ namespace xSaliceReligionAIO.Champions
 
             RMec();
 
-            if (menu.Item("R_Killable", true).GetValue<bool>())
+            if (menu.Item("R_Killable", true).GetValue<bool>() && Q.IsReady() && E.IsReady())
             {
                 var pred = R.GetPrediction(target);
                 if (dmg > target.Health && pred.Hitchance >= HitChance.High)

@@ -44,8 +44,7 @@ namespace xSaliceReligionAIO.Champions
         private void LoadMenu()
         {
             //Keys
-            var key = new Menu("键位", "Keys"); 
-            { 
+            var key = new Menu("键位", "Keys"); { 
                 key.AddItem(new MenuItem("ComboActive", "连招!", true).SetValue(new KeyBind(32, KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActive", "骚扰!", true).SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
                 key.AddItem(new MenuItem("HarassActiveT", "骚扰 (自动)!", true).SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
@@ -60,8 +59,7 @@ namespace xSaliceReligionAIO.Champions
             var spellMenu = new Menu("技能 菜单", "SpellMenu");
             {
                 //Q Menu
-                var qMenu = new Menu("Q 技能", "QSpell");
-                {
+                var qMenu = new Menu("Q 技能", "QSpell");{
                     qMenu.AddItem(new MenuItem("qHit", "Q 连招 命中率", true).SetValue(new Slider(3, 1, 3)));
                     qMenu.AddItem(new MenuItem("qHit2", "Q 骚扰 命中率", true).SetValue(new Slider(3, 1, 4)));
                     spellMenu.AddSubMenu(qMenu);
@@ -85,8 +83,7 @@ namespace xSaliceReligionAIO.Champions
                     spellMenu.AddSubMenu(eMenu);
                 }
                 //R
-                var rMenu = new Menu("R 技能", "RSpell"); 
-                {
+                var rMenu = new Menu("R 技能", "RSpell"); {
                     rMenu.AddItem(new MenuItem("autoR", "使用R|敌方人数", true).SetValue(new Slider(3, 1, 5)));
                     rMenu.AddItem(new MenuItem("blockR", "没有敌人禁用R", true).SetValue(true));
                     rMenu.AddItem(new MenuItem("overK", "击杀 提示", true).SetValue(true));
@@ -273,7 +270,7 @@ namespace xSaliceReligionAIO.Champions
                 if (!(menu.Item("killR", true).GetValue<KeyBind>().Active)) //check if multi
                 {
                     if (menu.Item("overK", true).GetValue<bool>() &&
-                        (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetAutoAttackDamage(target)) >= target.Health)
+                        (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetSpellDamage(target, SpellSlot.W)) >= target.Health)
                     {
                         return;
                     }
@@ -725,7 +722,7 @@ namespace xSaliceReligionAIO.Champions
             }
         }
 
-        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        protected override void Interrupter_OnPosibleToInterrupt(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs spell)
         {
             if (!menu.Item("UseInt", true).GetValue<bool>()) return;
 
